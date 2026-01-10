@@ -48,7 +48,7 @@ export default function App() {
             <div className="party-logo">{game.partyName.charAt(0)}</div>
             <div>
             <h1 className="party-name">{game.partyName}</h1>
-            <p className="turn-info">Turno {game.turn}</p>
+            <p className="turn-info">Turno {game.turn} | Legislatura {game.legislature}</p>
             </div>
         </div>
         

@@ -3,11 +3,13 @@ import { generateRivals } from '../functions/generateRivals';
 import { LAWS } from '../data/constants';
 
 const GDP_BASE = 100000; // PIB del país para calcular recaudación
+const TURNS_PER_LEGISLATURE = 20; // 20 turnos por legislatura
 
 export const useGameLogic = () => {
   // --- ESTADOS BÁSICOS ---
   const [phase, setPhase] = useState('setup');
   const [turn, setTurn] = useState(1);
+  const [legislature, setLegislature] = useState(1); // 🔸 NUEVO: legislatura actual
   const [messages, setMessages] = useState([]);
   
   // --- DATOS DEL JUGADOR ---
@@ -58,41 +60,72 @@ export const useGameLogic = () => {
     addMessage(`¡${partyName} fundado! La economía está al ${economy.taxRate}% de impuestos.`, "success");
   };
 
-  // --- LÓGICA DE VOTACIÓN DE IMPUESTOS (NUEVO) ---
+  // --- NUEVA FUNCIÓN: ELECCIONES ---
+  const holdElections = () => {
+    // Fórmula: popularidad (0-100) → escaños (1-35)
+    const newSeats = Math.max(1, Math.min(35, Math.floor((resources.popularity / 100) * 35)));
+    
+    // Mensaje según cambio
+    const change = newSeats - resources.seats;
+    if (change > 0) {
+      addMessage(`¡Victoria electoral! Ganas ${change} escaños (${newSeats} total).`, "success");
+    } else if (change < 0) {
+      addMessage(`Derrota electoral. Pierdes ${Math.abs(change)} escaños (${newSeats} total).`, "error");
+    } else {
+      addMessage(`Empate electoral. Conservas ${newSeats} escaños.`, "warning");
+    }
+
+    // Actualizar estado
+    setResources(prev => ({ ...prev, seats: newSeats }));
+    const newRivals = generateRivals(newSeats);
+    setRivalParties(newRivals);
+
+    // Reiniciar turno, avanzar legislatura
+    setTurn(1);
+    setLegislature(prev => prev + 1);
+  };
+
+  // --- NUEVA FUNCIÓN: FINALIZAR TURNO ---
+  const endTurn = () => {
+    const nextTurn = turn + 1;
+    if (nextTurn > TURNS_PER_LEGISLATURE) {
+      holdElections();
+    } else {
+      setTurn(nextTurn);
+    }
+  };
+
+  // --- LÓGICA DE VOTACIÓN DE IMPUESTOS ---
+  const getPartySupportForTaxChange = (partyIdeology, isTaxHike) => {
+    if (partyIdeology === 'FAR_LEFT') return isTaxHike;
+    if (partyIdeology === 'LEFT') return isTaxHike;
+    if (partyIdeology === 'GREEN') return isTaxHike;
+    if (partyIdeology === 'CENTER') return !isTaxHike;
+    if (partyIdeology === 'RIGHT') return !isTaxHike;
+    if (partyIdeology === 'FAR_RIGHT') return !isTaxHike;
+    if (partyIdeology === 'MINOR' || partyIdeology === 'POPULIST') {
+      return Math.random() > 0.4;
+    }
+    return Math.random() > 0.5;
+  };
+
   const proposeTaxChange = () => {
     if (taxProposal === economy.taxRate) return;
 
     const isTaxHike = taxProposal > economy.taxRate;
     let yesVotes = 0;
 
-    // Lógica de votación de los rivales
     rivalParties.forEach(party => {
-      let vote = false;
-      
-      // DERECHA (Conservadores/Oligarquía): Odian subir impuestos, aman bajarlos
-      if (party.ideology === 'RIGHT') {
-        vote = !isTaxHike; 
-      }
-      // IZQUIERDA (Sindicatos): Aman subir impuestos (para gastar), odian bajarlos
-      else if (party.ideology === 'LEFT') {
-        vote = isTaxHike;
-      }
-      // CENTRO/POPULISTAS: Depende de la popularidad o aleatorio
-      else {
-        vote = Math.random() > 0.5;
-      }
-
+      const vote = getPartySupportForTaxChange(party.ideology, isTaxHike);
       if (vote) yesVotes += party.seats;
     });
 
-    // Tu voto (asumimos que votas a favor de tu propia propuesta)
     yesVotes += resources.seats;
 
     if (yesVotes > 50) {
       setEconomy(prev => ({ ...prev, taxRate: taxProposal }));
       addMessage(`Reforma Fiscal APROBADA (${yesVotes} votos). Impuestos: ${taxProposal}%`, "success");
       
-      // Consecuencia en popularidad inmediata
       if (isTaxHike) {
         setResources(prev => ({...prev, popularity: prev.popularity - 5}));
         addMessage("La gente protesta por la subida de impuestos.", "warning");
@@ -102,13 +135,14 @@ export const useGameLogic = () => {
       }
     } else {
       addMessage(`Reforma Fiscal RECHAZADA (${yesVotes} votos).`, "error");
-      setTaxProposal(economy.taxRate); // Reset slider
+      setTaxProposal(economy.taxRate);
     }
+
+    endTurn(); // 🔸 Aquí se llama al sistema de legislaturas
   };
 
   // --- ACCIONES DE TURNO ---
   const handleAction = (actionType) => {
-    // (Igual que antes, omitido por brevedad, pero mantenemos la lógica de dinero del partido)
     if (actionType === 'campaign') {
         if(resources.money >= 500) {
             setResources(p => ({...p, money: p.money - 500, popularity: p.popularity + 2}));
@@ -122,15 +156,42 @@ export const useGameLogic = () => {
     setPhase('legislation');
   };
 
+  // --- LÓGICA DE AFINIDAD IDEOLÓGICA PARA LEYES ---
+  const getPartySupportForLaw = (partyIdeology, lawFavor) => {
+    if (partyIdeology === 'FAR_LEFT') {
+      return ['far-left', 'center-left'].includes(lawFavor);
+    }
+    if (partyIdeology === 'LEFT') {
+      return ['center-left', 'green'].includes(lawFavor);
+    }
+    if (partyIdeology === 'CENTER') {
+      return ['center-left', 'center-right', 'neutral', 'green'].includes(lawFavor);
+    }
+    if (partyIdeology === 'RIGHT') {
+      return ['center-right', 'neutral'].includes(lawFavor);
+    }
+    if (partyIdeology === 'FAR_RIGHT') {
+      return ['far-right', 'center-right'].includes(lawFavor);
+    }
+    if (partyIdeology === 'GREEN') {
+      return ['green', 'center-left'].includes(lawFavor);
+    }
+    if (partyIdeology === 'MINOR' || partyIdeology === 'POPULIST') {
+      if (lawFavor === 'far-left' || lawFavor === 'far-right') return Math.random() > 0.3;
+      return ['center-left', 'center-right', 'neutral', 'green'].includes(lawFavor) && Math.random() > 0.5;
+    }
+    return lawFavor === 'neutral' || Math.random() > 0.6;
+  };
+
   // --- VOTACIÓN DE LEYES ---
   const voteOnLaw = (vote) => {
     let yesVotes = 0;
     
-    // Lógica simple de rivales (se puede mejorar luego)
     rivalParties.forEach(party => {
-      if (currentLaw.favor === 'right' && party.ideology === 'RIGHT') yesVotes += party.seats;
-      else if (currentLaw.favor === 'left' && party.ideology === 'LEFT') yesVotes += party.seats;
-      else if (Math.random() > 0.5) yesVotes += party.seats;
+      const supports = getPartySupportForLaw(party.ideology, currentLaw.favor);
+      if (supports) {
+        yesVotes += party.seats;
+      }
     });
 
     if (vote === 'yes') yesVotes += resources.seats;
@@ -138,13 +199,11 @@ export const useGameLogic = () => {
     if (yesVotes > 50) {
       addMessage(`Ley "${currentLaw.title}" APROBADA.`, "success");
       
-      // IMPACTO EN ECONOMÍA NACIONAL
       setEconomy(prev => ({
         ...prev,
         annualSpending: prev.annualSpending + (currentLaw.fiscalCost || 0)
       }));
 
-      // Mensaje de impacto fiscal
       if (currentLaw.fiscalCost > 0) addMessage(`El gasto público aumenta en $${currentLaw.fiscalCost}M`, "warning");
       else if (currentLaw.fiscalCost < 0) addMessage(`El estado ahorra $${Math.abs(currentLaw.fiscalCost)}M`, "success");
 
@@ -153,11 +212,8 @@ export const useGameLogic = () => {
     }
 
     // --- FIN DE TURNO Y CÁLCULO DE DEUDA ---
-    // Calculamos el déficit/superávit del turno
     const revenue = (economy.taxRate / 100) * GDP_BASE;
-    const deficit = economy.annualSpending - revenue; // Positivo es malo (falta dinero)
-    
-    // Actualizamos deuda (simplificado: 1000M de déficit = +1% deuda)
+    const deficit = economy.annualSpending - revenue;
     const debtChange = deficit / 1000;
     
     setEconomy(prev => ({
@@ -167,15 +223,14 @@ export const useGameLogic = () => {
 
     if (economy.debt > 90) addMessage("¡PELIGRO! La deuda está crítica.", "error");
 
-    setPhase('dashboard');
-    setTurn(t => t + 1);
+    endTurn(); // 🔸 Aquí se llama al sistema de legislaturas
   };
 
   return {
-    phase, rivalParties, viewMode, setViewMode, turn, messages,
+    phase, rivalParties, viewMode, setViewMode, turn, legislature, messages, // 🔸 legislature exportado
     partyName, setPartyName, ideologyX, setIdeologyX, ideologyY, setIdeologyY,
     resources, candidates, currentLaw, economy, setEconomy,
-    taxProposal, setTaxProposal, proposeTaxChange, // Exportamos lo nuevo
+    taxProposal, setTaxProposal, proposeTaxChange,
     handleFundarPartido, handleAction, startLegislativeSession, voteOnLaw
   };
 };

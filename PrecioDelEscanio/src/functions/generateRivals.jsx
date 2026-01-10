@@ -1,57 +1,87 @@
 import { IDEOLOGIES } from "../data/partyData.jsx";
 
+// Función auxiliar para evitar nombres duplicados
+const getUniqueName = (ideoData, usedNames) => {
+  const availableNames = ideoData.names.filter(name => !usedNames.has(name));
+  if (availableNames.length > 0) {
+    const name = availableNames[Math.floor(Math.random() * availableNames.length)];
+    usedNames.add(name);
+    return name;
+  }
+  // Fallback: si todos los nombres están usados, añadimos un sufijo
+  let index = 1;
+  let fallbackName;
+  do {
+    fallbackName = `${ideoData.names[0]} ${index}`;
+    index++;
+  } while (usedNames.has(fallbackName));
+  usedNames.add(fallbackName);
+  return fallbackName;
+};
+
 export const generateRivals = (playerSeats) => {
   const rivals = [];
   let remainingSeats = 100 - playerSeats;
+  const usedNames = new Set(); // ⬅️ Conjunto para evitar nombres duplicados
 
   // 1. LA OLIGARQUÍA (Excepción Específica)
-  // Queremos que siempre exista, sea pequeña (pocos escaños) pero clara.
-  // Asumimos que IDEOLOGIES tiene una key 'RIGHT' o 'LIBERTARIAN' para ellos.
-  const oligarchySeats = Math.max(3, Math.floor(Math.random() * 6)); // Entre 3 y 5 escaños fijos
-  const oligarchyData = IDEOLOGIES['RIGHT']; // O 'LIBERTARIAN' si lo tienes en tu data
+  const oligarchySeats = Math.max(3, Math.floor(Math.random() * 6));
+  const oligarchyData = IDEOLOGIES['RIGHT'];
+  
+  const oligarchyName = "Círculo Empresarial"; // Nombre fijo
+  usedNames.add(oligarchyName);
   
   rivals.push({
-    name: "Círculo Empresarial", // Nombre forzado o random de la lista
+    name: oligarchyName,
     seats: oligarchySeats,
     ideology: 'RIGHT',
-    isOligarchy: true, // Flag útil para lógica futura (lobby, corrupción)
-    color: 'text-yellow-500', // Forzamos visualmente que se distingan
+    isOligarchy: true,
+    color: 'text-yellow-500',
     bg: 'bg-yellow-500',
-    x: 85 + Math.random() * 10, // Siempre muy a la derecha
-    y: 45 + Math.random() * 10  // En el centro vertical (poder económico)
+    x: 85 + Math.random() * 10,
+    y: 45 + Math.random() * 10
   });
 
   remainingSeats -= oligarchySeats;
 
-  // 2. LOS GIGANTES (El Pueblo)
-  // En lugar de ser random, forzamos que Conservadores y Sindicatos sean los principales.
+  // 2. EL FRENTE REVOLUCIONARIO (Opuesto ideológico de la oligarquía)
+  const farLeftSeats = Math.max(3, Math.floor(Math.random() * 6));
+  const farLeftData = IDEOLOGIES['FAR_LEFT'] || IDEOLOGIES['LEFT'] || IDEOLOGIES['RIGHT'];
   
-  // Definimos los gigantes con sus "Pesos" demográficos
+  const farLeftName = "Frente Revolucionario"; // Nombre fijo
+  usedNames.add(farLeftName);
+  
+  rivals.push({
+    name: farLeftName,
+    seats: farLeftSeats,
+    ideology: 'FAR_LEFT',
+    isFarLeft: true,
+    color: 'text-red-600',
+    bg: 'bg-red-600',
+    x: 5 + Math.random() * 10,
+    y: 45 + Math.random() * 10
+  });
+
+  remainingSeats -= farLeftSeats;
+
+  // 3. LOS GIGANTES (El Pueblo)
   const giantConfig = [
-    { key: 'RIGHT', weight: 0.45 }, // Conservadores: ~45% de lo que queda
-    { key: 'LEFT', weight: 0.35 }   // Sindicatos: ~35% de lo que queda
+    { key: 'RIGHT', weight: 0.45 },
+    { key: 'LEFT', weight: 0.35 }
   ];
 
-  // A veces aparece un tercer gigante (Centro) robando votos a ambos
   if (Math.random() > 0.6) {
     giantConfig.push({ key: 'CENTER', weight: 0.20 });
-    // Ajustamos pesos si entra el centro
     giantConfig[0].weight = 0.35;
     giantConfig[1].weight = 0.25;
   }
 
-  // Generamos los Gigantes
   giantConfig.forEach((config) => {
     const ideoData = IDEOLOGIES[config.key];
-    const name = ideoData.names[Math.floor(Math.random() * ideoData.names.length)];
+    const name = getUniqueName(ideoData, usedNames);
     
-    // Calculamos escaños basados en el peso asignado
     let seats = Math.floor(remainingSeats * config.weight);
-    
-    // Pequeña variación aleatoria (+- 2 escaños) para que no sea estático
     seats += Math.floor(Math.random() * 5) - 2;
-    
-    // Seguridad: Que no sea 0 ni negativo
     seats = Math.max(5, seats);
 
     rivals.push({
@@ -60,44 +90,48 @@ export const generateRivals = (playerSeats) => {
       ideology: config.key,
       color: ideoData.color,
       bg: ideoData.bg,
-      // Mantenemos tu lógica de coordenadas
       x: config.key === 'RIGHT' ? 65 + Math.random() * 15 : (config.key === 'LEFT' ? 15 + Math.random() * 15 : 45 + Math.random() * 10),
       y: 20 + Math.random() * 60
     });
   });
 
   // Recalculamos lo que queda para los partidos minoritarios
-  const spentSeats = rivals.reduce((sum, r) => sum + r.seats, 0); // Ojo: esto incluye la oligarquía que pusimos antes
+  const spentSeats = rivals.reduce((sum, r) => sum + r.seats, 0);
   remainingSeats = 100 - playerSeats - spentSeats; 
 
-  // 3. LOS MINORITARIOS (Relleno del hemiciclo)
-  // Usamos tu lógica original para rellenar lo que sobre
-  if (remainingSeats > 0) {
-    const minorCategories = ['GREEN', 'MINOR', 'CENTER', 'POPULIST'];
-    
-    // Intentamos crear tantos partidos pequeños como quepan (mínimo 2 escaños por partido)
-    while (remainingSeats >= 2) {
-      const randomCat = minorCategories[Math.floor(Math.random() * minorCategories.length)];
-      const ideoData = IDEOLOGIES[randomCat] || IDEOLOGIES['MINOR'];
-      
-      const name = ideoData.names[Math.floor(Math.random() * ideoData.names.length)];
-      
-      // Asignamos entre 2 y 6 escaños, o lo que quede
-      const seats = Math.min(remainingSeats, Math.max(2, Math.floor(Math.random() * 6)));
-      
-      remainingSeats -= seats;
+// 4. LOS MINORITARIOS (Relleno del hemiciclo)
+if (remainingSeats > 0) {
+  const minorCategories = ['GREEN', 'MINOR', 'CENTER', 'POPULIST', 'FAR_RIGHT', 'ANARCHIST'];
+  // Mezclamos y evitamos repetir categorías
+  const shuffledCategories = [...minorCategories].sort(() => Math.random() - 0.5);
+  const usedMinorIdeologies = new Set();
 
-      rivals.push({
-        name,
-        seats,
-        ideology: randomCat,
-        color: ideoData.color,
-        bg: ideoData.bg,
-        x: 10 + Math.random() * 80,
-        y: 60 + Math.random() * 30 
-      });
-    }
+  while (remainingSeats >= 2 && shuffledCategories.length > 0) {
+    // Sacamos una categoría aleatoria sin repetir
+    const randomIndex = Math.floor(Math.random() * shuffledCategories.length);
+    const randomCat = shuffledCategories.splice(randomIndex, 1)[0];
+    
+    // Evitamos usar la misma ideología dos veces
+    if (usedMinorIdeologies.has(randomCat)) continue;
+    usedMinorIdeologies.add(randomCat);
+
+    const ideoData = IDEOLOGIES[randomCat] || IDEOLOGIES['MINOR'];
+    const name = getUniqueName(ideoData, usedNames);
+    
+    const seats = Math.min(remainingSeats, Math.max(2, Math.floor(Math.random() * 6)));
+    remainingSeats -= seats;
+
+    rivals.push({
+      name,
+      seats,
+      ideology: randomCat,
+      color: ideoData.color,
+      bg: ideoData.bg,
+      x: 10 + Math.random() * 80,
+      y: 60 + Math.random() * 30 
+    });
   }
+}
 
   // Paso extra de limpieza: Si sobró 1 escaño suelto por redondeos, dáselo al partido más grande
   if (remainingSeats > 0) {

@@ -1,44 +1,80 @@
 export const FACTIONS = [
-  { id: 'conserv', name: 'Conservadores', x: 70, y: 70, color: 'bg-blue', desc: 'Tradición, Orden, Religión' },
-  { id: 'lib', name: 'Liberales', x: 30, y: 30, color: 'bg-indigo', desc: 'Derechos Civiles, Educación' },
-  { id: 'com', name: 'Sindicatos/Comunistas', x: 10, y: 50, color: 'bg-red', desc: 'Estado fuerte, Anti-capital' },
-  { id: 'cap', name: 'Oligarquía/Libertarios', x: 90, y: 50, color: 'bg-yellow', desc: 'Mercado libre, Cero impuestos' },
-  { id: 'pop', name: 'Desencantados', x: 50, y: 50, color: 'bg-gray', desc: 'Votan por carisma o populismo' },
+    { id: 'far_left', name: 'Comunistas Radicales', x: 5, y: 50, color: 'bg-red-800', desc: 'Corrupción revolucionaria, culto al líder' },
+    { id: 'far_right', name: 'Nacionalistas Ultras', x: 95, y: 50, color: 'bg-black', desc: 'Orden autoritario, purismo ideológico' },
+    { id: 'conserv', name: 'Conservadores', x: 70, y: 70, color: 'bg-blue', desc: 'Tradición, Orden, Religión' },
+    { id: 'lib', name: 'Liberales', x: 30, y: 30, color: 'bg-indigo', desc: 'Derechos Civiles, Educación' },
+    { id: 'com', name: 'Sindicatos/Comunistas', x: 10, y: 50, color: 'bg-red', desc: 'Estado fuerte, Anti-capital' },
+    { id: 'cap', name: 'Oligarquía/Libertarios', x: 90, y: 50, color: 'bg-yellow', desc: 'Mercado libre, Cero impuestos' },
+    { id: 'pop', name: 'Desencantados', x: 50, y: 50, color: 'bg-gray', desc: 'Votan por carisma o populismo' },
 ];
 
 export const LAWS = [
-    { title: "Flat Tax Reform", type: "economic", favor: "right", impact: { money: 180, chaos: 10, approvalLeft: -25, approvalRight: 22 } },
-    { title: "Border Security Expansion", type: "security", favor: "right", impact: { money: -120, chaos: -5, approvalLeft: -20, approvalRight: 28 } },
-    { title: "Deregulation of Small Business Licensing", type: "economic", favor: "right", impact: { money: 130, chaos: 5, approvalLeft: -10, approvalRight: 20 } },
-    { title: "Mandatory Minimum Sentences for Drug Trafficking", type: "security", favor: "right", impact: { money: -90, chaos: -15, approvalLeft: -30, approvalRight: 25 } },
-    { title: "Tax Incentives for Fossil Fuel Investment", type: "economic", favor: "right", impact: { money: 200, chaos: 15, approvalLeft: -28, approvalRight: 24 } },
-    { title: "Ban on Gender Ideology in Public Schools", type: "social", favor: "right", impact: { money: -20, chaos: 25, approvalLeft: -35, approvalRight: 30 } },
-    { title: "Privatization of Public Transit", type: "economic", favor: "right", impact: { money: 160, chaos: 20, approvalLeft: -22, approvalRight: 18 } },
-    { title: "National Defense Industry Subsidies", type: "economic", favor: "right", impact: { money: -140, chaos: -8, approvalLeft: -15, approvalRight: 26 } },
-    { title: "Religious Freedom Restoration Act", type: "social", favor: "right", impact: { money: -30, chaos: 18, approvalLeft: -24, approvalRight: 27 } },
-    { title: "Fast-Track Deportation for Undocumented Criminals", type: "security", favor: "right", impact: { money: -60, chaos: 5, approvalLeft: -27, approvalRight: 32 } },
-    { title: "Privatización del Agua", type: "economic", favor: "right", impact: { money: 200, chaos: 10, approvalLeft: -15, approvalRight: 10 } },
-    { title: "Salud Universal Gratuita", type: "social", favor: "left", impact: { money: -200, chaos: -5, approvalLeft: 15, approvalRight: -10 } },
-    { title: "Ley de Mano Dura", type: "security", favor: "right", impact: { money: -50, chaos: -20, approvalLeft: -20, approvalRight: 20 } },
-    { title: "Impuesto a la Riqueza", type: "economic", favor: "left", impact: { money: 150, chaos: 5, approvalLeft: 20, approvalRight: -25 } },
-    { title: "Free Public University Education", type: "social", favor: "left", impact: { money: -220, chaos: -10, approvalLeft: 26, approvalRight: -22 } },
-{ title: "Green Energy Transition Fund", type: "economic", favor: "left", impact: { money: -250, chaos: 8, approvalLeft: 28, approvalRight: -25 } },
-{ title: "Rent Control in Urban Centers", type: "social", favor: "left", impact: { money: -80, chaos: 12, approvalLeft: 24, approvalRight: -30 } },
-{ title: "Universal Childcare Subsidy", type: "social", favor: "left", impact: { money: -190, chaos: -15, approvalLeft: 30, approvalRight: -18 } },
-{ title: "Ban on Single-Use Plastics", type: "economic", favor: "left", impact: { money: -70, chaos: 10, approvalLeft: 22, approvalRight: -20 } },
-{ title: "Worker Representation on Corporate Boards", type: "economic", favor: "left", impact: { money: -50, chaos: 5, approvalLeft: 25, approvalRight: -28 } },
-{ title: "Decriminalization of All Drug Possession", type: "social", favor: "left", impact: { money: 40, chaos: 18, approvalLeft: 27, approvalRight: -32 } },
-{ title: "4-Day Workweek Pilot Program", type: "economic", favor: "left", impact: { money: -100, chaos: -5, approvalLeft: 29, approvalRight: -15 } },
-{ title: "Wealth Tax on Assets Over $10M", type: "economic", favor: "left", impact: { money: 170, chaos: 15, approvalLeft: 30, approvalRight: -35 } },
-{ title: "National Housing Construction Initiative", type: "social", favor: "left", impact: { money: -300, chaos: -20, approvalLeft: 32, approvalRight: -20 } },
-{ title: "Independent Electoral Commission Reform", type: "institutional", favor: "neutral", impact: { money: -40, chaos: -25, approvalLeft: 12, approvalRight: 12 } },
-{ title: "Digital ID and E-Government Infrastructure", type: "institutional", favor: "neutral", impact: { money: -150, chaos: -10, approvalLeft: 15, approvalRight: 15 } },
-{ title: "Anti-Corruption Whistleblower Protection Act", type: "institutional", favor: "neutral", impact: { money: -30, chaos: -20, approvalLeft: 20, approvalRight: 20 } },
-{ title: "National Broadband Access Program", type: "economic", favor: "neutral", impact: { money: -180, chaos: -8, approvalLeft: 18, approvalRight: 18 } },
-{ title: "Pension System Solvency Reform", type: "economic", favor: "neutral", impact: { money: 90, chaos: 15, approvalLeft: -12, approvalRight: -12 } },
-{ title: "Disaster Resilience and Climate Adaptation Fund", type: "economic", favor: "neutral", impact: { money: -200, chaos: -18, approvalLeft: 20, approvalRight: 20 } },
-{ title: "Mandatory Civic Education in Schools", type: "social", favor: "neutral", impact: { money: -60, chaos: -5, approvalLeft: 10, approvalRight: 10 } },
-{ title: "Public Procurement Transparency Act", type: "institutional", favor: "neutral", impact: { money: 50, chaos: -15, approvalLeft: 16, approvalRight: 16 } },
-{ title: "AI and Algorithmic Accountability Framework", type: "institutional", favor: "neutral", impact: { money: -100, chaos: 5, approvalLeft: 14, approvalRight: 14 } },
-{ title: "Rural Healthcare Access Initiative", type: "social", favor: "neutral", impact: { money: -170, chaos: -12, approvalLeft: 18, approvalRight: 18 } },
+  // === Leves iniciales (ajustadas) ===
+  { title: "Privatización del Agua", type: "economic", favor: "far-right", fiscalCost: -2200, impact: { chaos: 10, approvalLeft: -20, approvalRight: 10 } },
+  { title: "Salud Universal Gratuita", type: "social", favor: "center-left", fiscalCost: 2800, impact: { chaos: -5, approvalLeft: 20, approvalRight: -10 } },
+  { title: "Ley de Mano Dura", type: "security", favor: "far-right", fiscalCost: 900, impact: { chaos: -20, approvalLeft: -20, approvalRight: 20 } },
+  { title: "Subsidio al Desempleo", type: "social", favor: "center-left", fiscalCost: 1800, impact: { chaos: -5, approvalLeft: 15, approvalRight: -15 } },
+  { title: "Recorte a la Cultura", type: "economic", favor: "center-right", fiscalCost: -400, impact: { chaos: 5, approvalLeft: -10, approvalRight: 5 } },
+
+  // === Derecha (reclasificadas y ajustadas) ===
+  { title: "Reforma de Impuesto Plano", type: "economic", favor: "far-right", fiscalCost: -2000, impact: { chaos: 10, approvalLeft: -25, approvalRight: 22 } },
+  { title: "Ampliación de Seguridad Fronteriza", type: "security", favor: "far-right", fiscalCost: 1000, impact: { chaos: -5, approvalLeft: -20, approvalRight: 28 } },
+  { title: "Desregulación de Trámites para Pymes", type: "economic", favor: "center-right", fiscalCost: -1000, impact: { chaos: 5, approvalLeft: -10, approvalRight: 20 } },
+  { title: "Penas Mínimas Obligatorias para Narcotráfico", type: "security", favor: "far-right", fiscalCost: 800, impact: { chaos: -15, approvalLeft: -30, approvalRight: 25 } },
+  { title: "Incentivos Fiscales para Combustibles Fósiles", type: "economic", favor: "center-right", fiscalCost: -1500, impact: { chaos: 15, approvalLeft: -28, approvalRight: 24 } },
+  { title: "Prohibición de Ideología de Género en Escuelas Públicas", type: "social", favor: "far-right", fiscalCost: -150, impact: { chaos: 25, approvalLeft: -35, approvalRight: 30 } },
+  { title: "Privatización del Transporte Público", type: "economic", favor: "far-right", fiscalCost: -1800, impact: { chaos: 20, approvalLeft: -22, approvalRight: 18 } },
+  { title: "Subsidios a la Industria de Defensa Nacional", type: "economic", favor: "center-right", fiscalCost: 1200, impact: { chaos: -8, approvalLeft: -15, approvalRight: 26 } },
+  { title: "Ley de Restauración de la Libertad Religiosa", type: "social", favor: "center-right", fiscalCost: -200, impact: { chaos: 18, approvalLeft: -24, approvalRight: 27 } },
+  { title: "Deportación Acelerada de Delincuentes Indocumentados", type: "security", favor: "far-right", fiscalCost: 500, impact: { chaos: 5, approvalLeft: -27, approvalRight: 32 } },
+
+  // === Izquierda (reclasificadas y ajustadas) ===
+  { title: "Educación Universitaria Pública y Gratuita", type: "social", favor: "center-left", fiscalCost: 2200, impact: { chaos: -10, approvalLeft: 26, approvalRight: -22 } },
+  { title: "Fondo para Transición Energética Verde", type: "economic", favor: "green", fiscalCost: 2500, impact: { chaos: 8, approvalLeft: 28, approvalRight: -25 } },
+  { title: "Control de Precios de Alquiler en Ciudades", type: "social", favor: "center-left", fiscalCost: 800, impact: { chaos: 12, approvalLeft: 24, approvalRight: -30 } },
+  { title: "Subsidio Universal de Cuidado Infantil", type: "social", favor: "center-left", fiscalCost: 1900, impact: { chaos: -15, approvalLeft: 30, approvalRight: -18 } },
+  { title: "Prohibición de Plásticos de Un Solo Uso", type: "economic", favor: "green", fiscalCost: 600, impact: { chaos: 10, approvalLeft: 22, approvalRight: -20 } },
+  { title: "Representación Obrera en Directorios Empresariales", type: "economic", favor: "center-left", fiscalCost: 500, impact: { chaos: 5, approvalLeft: 25, approvalRight: -28 } },
+  { title: "Descriminalización de Tenencia de Drogas", type: "social", favor: "center-left", fiscalCost: -400, impact: { chaos: 18, approvalLeft: 27, approvalRight: -32 } },
+  { title: "Programa Piloto de Jornada Laboral de 4 Días", type: "economic", favor: "center-left", fiscalCost: 1000, impact: { chaos: -5, approvalLeft: 29, approvalRight: -15 } },
+  { title: "Impuesto a la Riqueza sobre Activos > $10M", type: "economic", favor: "far-left", fiscalCost: -1700, impact: { chaos: 15, approvalLeft: 30, approvalRight: -35 } },
+  { title: "Iniciativa Nacional de Construcción de Vivienda", type: "social", favor: "center-left", fiscalCost: 3000, impact: { chaos: -20, approvalLeft: 32, approvalRight: -20 } },
+
+  // === Políticas Verdes ===
+  { title: "Impuesto al Carbono con Dividendo Ciudadano", type: "economic", favor: "green", fiscalCost: -1200, impact: { chaos: 12, approvalLeft: 25, approvalRight: -22 } },
+  { title: "Programa Nacional de Reforestación y Restauración de Suelos", type: "economic", favor: "green", fiscalCost: 1800, impact: { chaos: -10, approvalLeft: 20, approvalRight: 15 } },
+
+  // === Políticas Nucleares ===
+  { title: "Inversión en Centrales Nucleares de Nueva Generación", type: "economic", favor: "center-right", fiscalCost: 3200, impact: { chaos: 8, approvalLeft: 5, approvalRight: 18 } }, // Gasto extremo: infraestructura pesada
+  { title: "Modernización de Gestión de Residuos Nucleares", type: "economic", favor: "neutral", fiscalCost: 1200, impact: { chaos: -7, approvalLeft: 12, approvalRight: 12 } },
+
+  // === Leyes extremas (solo 2-3) ===
+  { title: "Nacionalización de la Banca Privada", type: "economic", favor: "far-left", fiscalCost: 3500, impact: { chaos: 35, approvalLeft: 35, approvalRight: -40 } }, // Gasto extremo + caos
+  { title: "Liquidación Total del Sector Público No Esencial", type: "economic", favor: "far-right", fiscalCost: -2500, impact: { chaos: 30, approvalLeft: -40, approvalRight: 35 } }, // Ahorro extremo + caos
+
+  // === Nuevas leyes realistas (deuda e ingresos) ===
+  { title: "Ley contra la Evasión Fiscal Internacional", type: "economic", favor: "center-left", fiscalCost: -1800, impact: { chaos: -10, approvalLeft: 28, approvalRight: -20 } },
+  { title: "Reestructuración de Deuda con Acreedores Externos", type: "economic", favor: "neutral", fiscalCost: -2800, impact: { chaos: 20, approvalLeft: 10, approvalRight: 5 } },
+
+  // === Neutrales (ajustadas) ===
+  { title: "Reforma de la Comisión Electoral Independiente", type: "institutional", favor: "neutral", fiscalCost: 400, impact: { chaos: -25, approvalLeft: 12, approvalRight: 12 } },
+  { title: "Infraestructura de Identidad Digital y Gobierno Electrónico", type: "institutional", favor: "neutral", fiscalCost: 1500, impact: { chaos: -10, approvalLeft: 15, approvalRight: 15 } },
+  { title: "Ley de Protección a Denunciantes de Corrupción", type: "institutional", favor: "neutral", fiscalCost: 300, impact: { chaos: -20, approvalLeft: 20, approvalRight: 20 } },
+  { title: "Programa Nacional de Acceso a Banda Ancha", type: "economic", favor: "neutral", fiscalCost: 1800, impact: { chaos: -8, approvalLeft: 18, approvalRight: 18 } },
+  { title: "Reforma para Sostenibilidad del Sistema de Pensiones", type: "economic", favor: "center-right", fiscalCost: -900, impact: { chaos: 15, approvalLeft: -12, approvalRight: -12 } },
+  { title: "Fondo Nacional de Resiliencia ante Desastres", type: "economic", favor: "neutral", fiscalCost: 2000, impact: { chaos: -18, approvalLeft: 20, approvalRight: 20 } },
+  { title: "Educación Cívica Obligatoria en Escuelas", type: "social", favor: "neutral", fiscalCost: 600, impact: { chaos: -5, approvalLeft: 10, approvalRight: 10 } },
+  { title: "Ley de Transparencia en Contrataciones Públicas", type: "institutional", favor: "neutral", fiscalCost: -500, impact: { chaos: -15, approvalLeft: 16, approvalRight: 16 } },
+  { title: "Marco de Rendición de Cuentas para Inteligencia Artificial", type: "institutional", favor: "neutral", fiscalCost: 1000, impact: { chaos: 5, approvalLeft: 14, approvalRight: 14 } },
+  { title: "Iniciativa de Acceso a Salud en Zonas Rurales", type: "social", favor: "center-left", fiscalCost: 1700, impact: { chaos: -12, approvalLeft: 18, approvalRight: 18 } },
+  { title: "Programa Nacional de Recualificación Laboral", type: "economic", favor: "neutral", fiscalCost: 1300, impact: { chaos: -10, approvalLeft: 16, approvalRight: 16 } },
+  { title: "Iniciativa para Reducir Rezago Judicial", type: "institutional", favor: "neutral", fiscalCost: 800, impact: { chaos: -20, approvalLeft: 18, approvalRight: 18 } },
+  { title: "Marco de Asociaciones Público-Privadas en Infraestructura", type: "economic", favor: "center-right", fiscalCost: -600, impact: { chaos: 5, approvalLeft: 10, approvalRight: 10 } },
+  { title: "Ampliación del Acceso a Salud Mental", type: "social", favor: "center-left", fiscalCost: 1600, impact: { chaos: -15, approvalLeft: 22, approvalRight: 12 } },
+  { title: "Ley de Protección de Datos y Privacidad del Consumidor", type: "institutional", favor: "neutral", fiscalCost: 700, impact: { chaos: -8, approvalLeft: 20, approvalRight: 15 } },
+  { title: "Sistema Estratégico de Reservas Alimentarias", type: "economic", favor: "neutral", fiscalCost: 900, impact: { chaos: -12, approvalLeft: 14, approvalRight: 14 } },
+  { title: "Mandato de Datos Gubernamentales Abiertos", type: "institutional", favor: "neutral", fiscalCost: -200, impact: { chaos: -10, approvalLeft: 15, approvalRight: 15 } },
+  { title: "Impulso a la Educación Técnica y Aprendizajes", type: "social", favor: "neutral", fiscalCost: 1100, impact: { chaos: -7, approvalLeft: 17, approvalRight: 17 } },
+  { title: "Programa Nacional de Ciberdefensa", type: "security", favor: "neutral", fiscalCost: 1400, impact: { chaos: -10, approvalLeft: 16, approvalRight: 16 } },
+  { title: "Plan de Conectividad Interregional", type: "economic", favor: "center-right", fiscalCost: 2200, impact: { chaos: -15, approvalLeft: 18, approvalRight: 18 } },
 ];

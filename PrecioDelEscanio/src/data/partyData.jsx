@@ -1,5 +1,3 @@
-// src/data/partyData.jsx
-
 export const IDEOLOGIES = {
   RIGHT: {
     id: 'derecha',
@@ -30,5 +28,24 @@ export const IDEOLOGIES = {
     color: 'text-purple-500',
     bg: 'bg-purple-500',
     names: ["PSH", "PAC", "Justicia Digital", "Unión Regional", "Movimiento Semilla"]
+  },
+  // --- NUEVAS IDEOLOGÍAS ---
+  FAR_LEFT: {
+    id: 'extrema_izquierda',
+    color: 'text-red-800',
+    bg: 'bg-red-800',
+    names: ["Frente Revolucionario", "Patria Socialista", "Corriente Roja", "Unión Popular Chavista", "Bloque Antiimperialista"]
+  },
+  FAR_RIGHT: {
+    id: 'extrema_derecha',
+    color: 'text-black',
+    bg: 'bg-black',
+    names: ["Guardia Nacional", "Movimiento Patriota", "Orden y Tradición", "Frente de la Patria Pura", "Unión Nacionalsindicalista"]
+  },
+  ANARCHIST: {
+    id: 'anarquistas',
+    color: 'text-gray-900',
+    bg: 'bg-gray-900',
+    names: ["Colectivo Sin Amos", "Red Libertaria", "Asamblea Popular Autónoma", "Frente Antiautoritario", "Horizontalidad Ya"]
   }
 };
