@@ -145,6 +145,8 @@ export default function App() {
               <SeatsView
                 resources={game.resources}
                 rivalParties={game.rivalParties}
+                playerIdeologyX={game.ideologyX}
+                playerColorClass={game.playerColor}
               />
             ) : (
               <PoliticalMap

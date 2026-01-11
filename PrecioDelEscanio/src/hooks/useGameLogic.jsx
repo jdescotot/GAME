@@ -16,6 +16,7 @@ export const useGameLogic = () => {
   const [partyName, setPartyName] = useState('Nuevo Movimiento');
   const [ideologyX, setIdeologyX] = useState(50);
   const [ideologyY, setIdeologyY] = useState(50);
+  const [playerColor, setPlayerColor] = useState('text-yellow-500');
   const [resources, setResources] = useState({
     money: 1000,       // Dinero del PARTIDO (Caja chica)
     politicalCapital: 20,
