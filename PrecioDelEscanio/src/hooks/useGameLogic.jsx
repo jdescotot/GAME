@@ -184,47 +184,51 @@ export const useGameLogic = () => {
   };
 
   // --- VOTACIÓN DE LEYES ---
-  const voteOnLaw = (vote) => {
-    let yesVotes = 0;
-    
-    rivalParties.forEach(party => {
-      const supports = getPartySupportForLaw(party.ideology, currentLaw.favor);
-      if (supports) {
-        yesVotes += party.seats;
-      }
-    });
-
-    if (vote === 'yes') yesVotes += resources.seats;
-
-    if (yesVotes > 50) {
-      addMessage(`Ley "${currentLaw.title}" APROBADA.`, "success");
-      
-      setEconomy(prev => ({
-        ...prev,
-        annualSpending: prev.annualSpending + (currentLaw.fiscalCost || 0)
-      }));
-
-      if (currentLaw.fiscalCost > 0) addMessage(`El gasto público aumenta en $${currentLaw.fiscalCost}M`, "warning");
-      else if (currentLaw.fiscalCost < 0) addMessage(`El estado ahorra $${Math.abs(currentLaw.fiscalCost)}M`, "success");
-
-    } else {
-      addMessage(`Ley RECHAZADA.`, "error");
+const voteOnLaw = (vote) => {
+  let yesVotes = 0;
+  
+  rivalParties.forEach(party => {
+    const supports = getPartySupportForLaw(party.ideology, currentLaw.favor);
+    if (supports) {
+      yesVotes += party.seats;
     }
+  });
 
-    // --- FIN DE TURNO Y CÁLCULO DE DEUDA ---
-    const revenue = (economy.taxRate / 100) * GDP_BASE;
-    const deficit = economy.annualSpending - revenue;
-    const debtChange = deficit / 1000;
+  if (vote === 'yes') yesVotes += resources.seats;
+
+  if (yesVotes > 50) {
+    addMessage(`Ley "${currentLaw.title}" APROBADA.`, "success");
     
     setEconomy(prev => ({
       ...prev,
-      debt: Math.max(0, prev.debt + debtChange)
+      annualSpending: prev.annualSpending + (currentLaw.fiscalCost || 0)
     }));
 
-    if (economy.debt > 90) addMessage("¡PELIGRO! La deuda está crítica.", "error");
+    if (currentLaw.fiscalCost > 0) addMessage(`El gasto público aumenta en $${currentLaw.fiscalCost}M`, "warning");
+    else if (currentLaw.fiscalCost < 0) addMessage(`El estado ahorra $${Math.abs(currentLaw.fiscalCost)}M`, "success");
 
-    endTurn(); // 🔸 Aquí se llama al sistema de legislaturas
-  };
+  } else {
+    addMessage(`Ley RECHAZADA.`, "error");
+  }
+
+  // --- FIN DE TURNO Y CÁLCULO DE DEUDA ---
+  const revenue = (economy.taxRate / 100) * GDP_BASE;
+  const deficit = economy.annualSpending - revenue;
+  const debtChange = deficit / 1000;
+  
+  setEconomy(prev => ({
+    ...prev,
+    debt: Math.max(0, prev.debt + debtChange)
+  }));
+
+  if (economy.debt > 90) addMessage("¡PELIGRO! La deuda está crítica.", "error");
+
+  setPhase('dashboard');
+  setCurrentLaw(null);
+
+  // Ahora sí, avanzar al siguiente turno (con legislaturas)
+  endTurn();
+};
 
   return {
     phase, rivalParties, viewMode, setViewMode, turn, legislature, messages, // 🔸 legislature exportado
