@@ -1,58 +1,32 @@
 import React, { useMemo } from 'react';
 
-// Mapeo de clases Tailwind a colores HEX para el renderizado
-const tailwindColorToHex = (colorClass) => {
-  if (!colorClass) return '#94a3b8';
-  // Extraemos solo el nombre del color (ej: 'text-yellow-500' → 'yellow-500')
-  const match = colorClass.match(/text-(\w+-\d+)/);
-  const key = match ? match[1] : null;
-  
-  const map = {
-    'yellow-500': '#eab308',
-    'red-600': '#dc2626',
-    'red-800': '#991b1b',
-    'blue-600': '#2563eb',
-    'emerald-500': '#10b981',
-    'purple-500': '#a855f7',
-    'black': '#000000',
-    'gray-900': '#111827'
-  };
-  return map[key] || '#94a3b8';
-};
-
 export function SeatsView({ 
   resources, 
   rivalParties = [],
   playerIdeologyX = 50,
-  playerColorClass = 'text-yellow-500', // Prop para compatibilidad con clases Tailwind
-  partyColor // Prop opcional directa en HEX (de la corrección)
+  // Ahora el color por defecto es un HEX directo (Amarillo Oro)
+  playerColor = '#eab308' 
 }) {
-  // DATOS DEL JUGADOR - Combinando ambos enfoques
   const playerSeats = resources?.seats || 0;
   
-  // PRIORIDAD: partyColor (HEX directo) > playerColorClass (Tailwind) > color por defecto
-  const playerColor = partyColor || tailwindColorToHex(playerColorClass) || '#eab308';
-
-  // Construcción de todos los escaños con posicionamiento ideológico (mantenido de original)
   const allSeats = useMemo(() => {
     let seats = [];
 
-    // Escaños del jugador
+    // TUS ESCAÑOS
     for (let i = 0; i < playerSeats; i++) {
       seats.push({
         id: `player-${i}`,
-        color: playerColor,
+        color: playerColor, // Usamos el hex directo
         isPlayer: true,
         ideologyX: playerIdeologyX
       });
     }
 
-    // Escaños de rivales
+    // RIVALES
     rivalParties.forEach((rival, rIndex) => {
-      // Para rivales: usar color de Tailwind si viene en rival.color, o bg si no
-      const rivalColor = rival.color ? tailwindColorToHex(rival.color) : 
-                        (rival.bg ? tailwindColorToHex(rival.bg) : '#94a3b8');
-      const rivalIdeologyX = rival.x || 50; // Si no tiene posición, va al centro
+      // Usamos rival.hex. Si no existe por error, usamos gris.
+      const rivalColor = rival.hex || '#94a3b8';
+      const rivalIdeologyX = rival.x || 50;
       
       for (let i = 0; i < rival.seats; i++) {
         seats.push({
@@ -65,13 +39,12 @@ export function SeatsView({
       }
     });
 
-    // Ordenar de izquierda (0) a derecha (100)
     return seats.sort((a, b) => a.ideologyX - b.ideologyX);
   }, [playerSeats, playerColor, playerIdeologyX, rivalParties]);
 
   return (
     <div className="seats-view-content h-full flex flex-col">
-      {/* Visualización del Hemiciclo - Combinando ambos estilos */}
+      {/* HEMICICLO */}
       <div className="hemiciclo flex-1 bg-gray-900/50 rounded-lg p-4 mb-4 relative overflow-hidden flex flex-wrap gap-1 justify-center items-start content-start">
         {allSeats.map((seat) => (
           <div
@@ -80,7 +53,7 @@ export function SeatsView({
             style={{
               width: '12px',
               height: '12px',
-              backgroundColor: seat.color,
+              backgroundColor: seat.color, // CSS Directo
               boxShadow: seat.isPlayer ? `0 0 4px ${seat.color}` : 'none',
               border: seat.isPlayer ? '1px solid white' : 'none',
               animation: seat.isPlayer ? 'pulse 2s infinite' : 'none'
@@ -89,7 +62,7 @@ export function SeatsView({
           />
         ))}
         
-        {/* Espacios vacíos para completar 100 escaños - Mantenido de original */}
+        {/* Espacios vacíos */}
         {[...Array(Math.max(0, 100 - allSeats.length))].map((_, i) => (
           <div 
             key={`empty-${i}`} 
@@ -99,40 +72,26 @@ export function SeatsView({
         ))}
       </div>
 
-      {/* Leyenda Dinámica - Combinando ambos estilos */}
+      {/* LEYENDA */}
       <div className="seats-legend grid grid-cols-2 gap-2 text-xs border-t border-gray-700 pt-2">
-        {/* Leyenda del jugador - Usando partyColor directamente */}
         <div className="legend-item flex items-center gap-2">
-          <div 
-            className="seat rounded-full" 
-            style={{ 
-              width: '10px', 
-              height: '10px', 
-              backgroundColor: playerColor 
-            }}
-          ></div>
+          <div className="seat rounded-full" style={{ width: '10px', height: '10px', backgroundColor: playerColor }}></div>
           <span className="font-bold">TÚ ({playerSeats})</span>
         </div>
         
-        {/* Leyenda de rivales */}
-        {rivalParties.map((party, idx) => {
-          const rivalColor = party.color ? tailwindColorToHex(party.color) : 
-                           (party.bg ? tailwindColorToHex(party.bg) : '#94a3b8');
-          
-          return (
-            <div key={idx} className="legend-item flex items-center gap-2">
-              <div 
-                className="seat rounded-full" 
-                style={{ 
-                  width: '10px', 
-                  height: '10px', 
-                  backgroundColor: rivalColor 
-                }}
-              ></div>
-              <span>{party.name} ({party.seats})</span>
-            </div>
-          );
-        })}
+        {rivalParties.map((party, idx) => (
+          <div key={idx} className="legend-item flex items-center gap-2">
+            <div 
+              className="seat rounded-full" 
+              style={{ 
+                width: '10px', 
+                height: '10px', 
+                backgroundColor: party.hex || '#94a3b8' 
+              }}
+            ></div>
+            <span>{party.name} ({party.seats})</span>
+          </div>
+        ))}
       </div>
     </div>
   );

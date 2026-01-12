@@ -38,6 +38,7 @@ export const generateRivals = (playerSeats) => {
     isOligarchy: true,
     color: 'text-yellow-500',
     bg: 'bg-yellow-500',
+    hex: '#eab308',
     x: 85 + Math.random() * 10,
     y: 45 + Math.random() * 10
   });
@@ -58,6 +59,7 @@ export const generateRivals = (playerSeats) => {
     isFarLeft: true,
     color: 'text-red-600',
     bg: 'bg-red-600',
+    hex: '#dc2626',
     x: 5 + Math.random() * 10,
     y: 45 + Math.random() * 10
   });
@@ -90,6 +92,7 @@ export const generateRivals = (playerSeats) => {
       ideology: config.key,
       color: ideoData.color,
       bg: ideoData.bg,
+      hex: ideoData.hex,
       x: config.key === 'RIGHT' ? 65 + Math.random() * 15 : (config.key === 'LEFT' ? 15 + Math.random() * 15 : 45 + Math.random() * 10),
       y: 20 + Math.random() * 60
     });
@@ -99,39 +102,46 @@ export const generateRivals = (playerSeats) => {
   const spentSeats = rivals.reduce((sum, r) => sum + r.seats, 0);
   remainingSeats = 100 - playerSeats - spentSeats; 
 
-// 4. LOS MINORITARIOS (Relleno del hemiciclo)
-if (remainingSeats > 0) {
-  const minorCategories = ['GREEN', 'MINOR', 'CENTER', 'POPULIST', 'FAR_RIGHT', 'ANARCHIST'];
-  // Mezclamos y evitamos repetir categorías
-  const shuffledCategories = [...minorCategories].sort(() => Math.random() - 0.5);
-  const usedMinorIdeologies = new Set();
+  // Identificar qué ideologías usaron los Gigantes (y otros ya creados)
+  const giantIdeologies = new Set(rivals.map(r => r.ideology));
 
-  while (remainingSeats >= 2 && shuffledCategories.length > 0) {
-    // Sacamos una categoría aleatoria sin repetir
-    const randomIndex = Math.floor(Math.random() * shuffledCategories.length);
-    const randomCat = shuffledCategories.splice(randomIndex, 1)[0];
+  // 4. LOS MINORITARIOS (Relleno del hemiciclo)
+  if (remainingSeats > 0) {
+    let minorCategories = ['GREEN', 'MINOR', 'CENTER', 'POPULIST', 'FAR_RIGHT', 'ANARCHIST'];
     
-    // Evitamos usar la misma ideología dos veces
-    if (usedMinorIdeologies.has(randomCat)) continue;
-    usedMinorIdeologies.add(randomCat);
+    // FILTRO NUEVO: Quitamos las categorías que ya están presentes en los partidos existentes (ej: CENTER)
+    minorCategories = minorCategories.filter(cat => !giantIdeologies.has(cat));
 
-    const ideoData = IDEOLOGIES[randomCat] || IDEOLOGIES['MINOR'];
-    const name = getUniqueName(ideoData, usedNames);
-    
-    const seats = Math.min(remainingSeats, Math.max(2, Math.floor(Math.random() * 6)));
-    remainingSeats -= seats;
+    const shuffledCategories = [...minorCategories].sort(() => Math.random() - 0.5);
+    const usedMinorIdeologies = new Set();
 
-    rivals.push({
-      name,
-      seats,
-      ideology: randomCat,
-      color: ideoData.color,
-      bg: ideoData.bg,
-      x: 10 + Math.random() * 80,
-      y: 60 + Math.random() * 30 
-    });
+    while (remainingSeats >= 2 && shuffledCategories.length > 0) {
+      // Sacamos una categoría aleatoria sin repetir
+      const randomIndex = Math.floor(Math.random() * shuffledCategories.length);
+      const randomCat = shuffledCategories.splice(randomIndex, 1)[0];
+      
+      // Evitamos usar la misma ideología dos veces
+      if (usedMinorIdeologies.has(randomCat)) continue;
+      usedMinorIdeologies.add(randomCat);
+
+      const ideoData = IDEOLOGIES[randomCat] || IDEOLOGIES['MINOR'];
+      const name = getUniqueName(ideoData, usedNames);
+      
+      const seats = Math.min(remainingSeats, Math.max(2, Math.floor(Math.random() * 6)));
+      remainingSeats -= seats;
+
+      rivals.push({
+        name,
+        seats,
+        ideology: randomCat,
+        color: ideoData.color,
+        bg: ideoData.bg,
+        hex: ideoData.hex,
+        x: 10 + Math.random() * 80,
+        y: 60 + Math.random() * 30 
+      });
+    }
   }
-}
 
   // Paso extra de limpieza: Si sobró 1 escaño suelto por redondeos, dáselo al partido más grande
   if (remainingSeats > 0) {
