@@ -168,16 +168,52 @@ export const useGameLogic = () => {
   };
 
   // --- ACCIONES DE TURNO ---
-  const handleAction = (actionType) => {
-    if (actionType === 'campaign') {
-        if(resources.money >= 500) {
-            setResources(p => ({...p, money: p.money - 500, popularity: Math.min(100, p.popularity + 2)}));
-            addMessage("Campaña realizada. Popularidad +2.", "success");
-        } else {
-            addMessage("No tienes suficiente dinero ($500) para campaña.", "error");
-        }
+const handleAction = (actionType) => {
+  if (actionType === 'campaign') {
+    if (resources.money >= 500) {
+      setResources(prev => ({
+        ...prev,
+        money: prev.money - 500,
+        popularity: Math.min(100, prev.popularity + 2)
+      }));
+      addMessage("Campaña realizada. Popularidad +2.", "success");
+    } else {
+      addMessage("No tienes suficiente dinero ($500) para campaña.", "error");
     }
-  };
+  } 
+  else if (actionType === 'lobby') {
+    if (resources.politicalCapital >= 5) {
+      setResources(prev => ({
+        ...prev,
+        politicalCapital: prev.politicalCapital - 5,
+        money: prev.money + 800,
+        popularity: Math.max(0, prev.popularity - 1)
+      }));
+      addMessage("Reunión con élites económicas. Recibes $800, pero pierdes popularidad.", "warning");
+    } else {
+      addMessage("Necesitas al menos 5 puntos de Capital Político para cabildear.", "error");
+    }
+  }
+  else if (actionType === 'protest') {
+    if (resources.politicalCapital >= 10) {
+      const success = Math.random() > 0.4; // 60% de éxito
+      setResources(prev => ({
+        ...prev,
+        politicalCapital: prev.politicalCapital - 10,
+        popularity: success
+          ? Math.min(100, prev.popularity + 3)
+          : Math.max(0, prev.popularity - 2)
+      }));
+      if (success) {
+        addMessage("¡La marcha fue un éxito! Aumenta la presión social.", "success");
+      } else {
+        addMessage("La protesta se volvió violenta. Caes en desgracia.", "error");
+      }
+    } else {
+      addMessage("Necesitas al menos 10 puntos de Capital Político para organizar una marcha.", "error");
+    }
+  }
+};
 
   const startLegislativeSession = () => {
     const randomLaw = LAWS[Math.floor(Math.random() * LAWS.length)];
