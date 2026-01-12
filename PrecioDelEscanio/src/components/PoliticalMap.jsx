@@ -1,11 +1,14 @@
 import React from 'react';
-import { FACTIONS } from '../data/constants';
 
 export function PoliticalMap({
   ideologyX,
   ideologyY,
   rivalParties,
+  factions,
 }) {
+  // Si por alguna razón no llegan facciones, no renderizamos nada o un array vacío para evitar crash
+  const safeFactions = factions || [];
+
   return (
     <div className="map-view-content">
       <div className="map-axis-h">
@@ -37,7 +40,7 @@ export function PoliticalMap({
         DERECHA
       </span>
 
-      {FACTIONS.map(f => (
+      {safeFactions.map(f => (
         <div
           key={f.id}
           className="faction-node"
@@ -45,7 +48,7 @@ export function PoliticalMap({
         >
           <div
             className={`faction-dot ${f.color}`}
-            title={f.desc}
+            title={`${f.name}: ${f.population}%`}
           ></div>
           <span className="faction-name">{f.name}</span>
         </div>

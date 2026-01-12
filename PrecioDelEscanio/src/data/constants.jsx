@@ -1,11 +1,90 @@
 export const FACTIONS = [
-    { id: 'far_left', name: 'Comunistas Radicales', x: 5, y: 50, color: 'bg-red-800', desc: 'Corrupción revolucionaria, culto al líder' },
-    { id: 'far_right', name: 'Nacionalistas Ultras', x: 95, y: 50, color: 'bg-black', desc: 'Orden autoritario, purismo ideológico' },
-    { id: 'conserv', name: 'Conservadores', x: 70, y: 70, color: 'bg-blue', desc: 'Tradición, Orden, Religión' },
-    { id: 'lib', name: 'Liberales', x: 30, y: 30, color: 'bg-indigo', desc: 'Derechos Civiles, Educación' },
-    { id: 'com', name: 'Sindicatos/Comunistas', x: 10, y: 50, color: 'bg-red', desc: 'Estado fuerte, Anti-capital' },
-    { id: 'cap', name: 'Oligarquía/Libertarios', x: 90, y: 50, color: 'bg-yellow', desc: 'Mercado libre, Cero impuestos' },
-    { id: 'pop', name: 'Desencantados', x: 50, y: 50, color: 'bg-gray', desc: 'Votan por carisma o populismo' },
+    // === IZQUIERDA Y EXTREMA IZQUIERDA ===
+    { 
+        id: 'far_left', // Base de: FAR_LEFT
+        name: 'Revolucionarios', 
+        x: 5, y: 80, // Economía controlada + Autoritarismo de partido
+        population: 10, // 10% de la población
+        color: 'bg-red-900', 
+        radius: 5,
+        desc: 'Anti-capitalistas radicales, buscan la revolución.' 
+    },
+    { 
+        id: 'com', // Base de: LEFT (Sindicatos)
+        name: 'Clase Obrera Organizada', 
+        x: 20, y: 60, // Izquierda económica, socialmente moderados
+        population: 20, 
+        color: 'bg-red-600', 
+        radius: 35,
+        desc: 'Derechos laborales, servicios públicos fuertes.' 
+    },
+    { 
+        id: 'anarchist', // Base de: ANARCHIST (NUEVO)
+        name: 'Colectivos Libertarios', 
+        x: 10, y: 10, // Economía comunal + Cero estado
+        population: 5, 
+        color: 'bg-gray-800', 
+        radius: 5,
+        desc: 'Autogestión, contra toda autoridad.' 
+    },
+
+    // === CENTRO Y ECOLOGISMO ===
+    { 
+        id: 'green', // Base de: GREEN (NUEVO)
+        name: 'Ecologistas', 
+        x: 35, y: 40, // Izquierda moderada + Libertad social
+        population: 10, 
+        color: 'bg-emerald-600', 
+        radius: 10,
+        desc: 'Sostenibilidad, justicia climática.' 
+    },
+    { 
+        id: 'lib', // Base de: CENTER / MINOR
+        name: 'Progresistas Urbanos', 
+        x: 45, y: 30, // Centro económico + Libertades civiles
+        population: 15, 
+        color: 'bg-indigo-500', 
+        radius: 20,
+        desc: 'Derechos civiles, educación laica, globalismo.' 
+    },
+    { 
+        id: 'pop', // Base de: POPULIST
+        name: 'Desencantados / Indecisos', 
+        x: 50, y: 50, // Centro absoluto (o apolíticos)
+        population: 35, // Un gran bloque que decide elecciones
+        color: 'bg-gray-400', 
+        radius: 30,
+        desc: 'Sin ideología fija, votan por carisma o contra el sistema.' 
+    },
+
+    // === DERECHA Y EXTREMA DERECHA ===
+    { 
+        id: 'cap', // Base de: RIGHT (Sector Empresarial)
+        name: 'Libertarios de Mercado', 
+        x: 90, y: 20, // Mercado libre absoluto + Poca intervención estatal
+        population: 8, 
+        color: 'bg-yellow-500', 
+        radius: 35,
+        desc: 'Bajos impuestos, estado mínimo, libre comercio.' 
+    },
+    { 
+        id: 'conserv', // Base de: RIGHT (Conservadores)
+        name: 'Conservadores Tradicionales', 
+        x: 75, y: 75, // Derecha económica + Orden social
+        population: 12, 
+        color: 'bg-blue-600', 
+        radius: 25,
+        desc: 'Familia, religión, orden institucional.' 
+    },
+    { 
+        id: 'far_right', // Base de: FAR_RIGHT
+        name: 'Nacionalistas', 
+        x: 95, y: 90, // Proteccionismo + Autoritarismo extremo
+        population: 5, 
+        color: 'bg-black', 
+        radius: 10,
+        desc: 'Identidad nacional, fronteras cerradas, mano dura.' 
+    },
 ];
 
 export const LAWS = [
