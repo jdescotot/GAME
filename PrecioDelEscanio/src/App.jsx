@@ -12,7 +12,7 @@ import { OperationsPanel } from './components/OperationsPanel';
 import { SeatsView } from './components/SeatsView';
 import { PoliticalMap } from './components/PoliticalMap';
 import { MessageLog } from './components/MessageLog';
-
+import { FACTIONS } from './data/constants';
 // Lógica
 import { useGameLogic } from './hooks/useGameLogic';
 
@@ -23,44 +23,75 @@ export default function App() {
   const currentRevenue = (game.economy.taxRate / 100) * 100000;
   const projectedDeficit = game.economy.annualSpending - currentRevenue;
 
-  if (game.phase === 'setup') {
+if (game.phase === 'setup') {
     return (
       <div className="setup-screen">
-        <div className="setup-card">
+        <div className="setup-card w-full max-w-2xl p-6"> {/* Hice la carta un poco más ancha */}
           <h1 className="setup-title">El Peso del Escaño</h1>
           <p className="setup-desc">Diseña tu partido. Ahora gestionas la crisis nacional.</p>
-          <div className="form-group">
-            <label>Nombre del Partido</label>
+          
+          <div className="form-group mb-6">
+            <label className="block text-sm font-bold mb-2">Nombre del Partido</label>
             <input
               type="text"
               value={game.partyName}
               onChange={(e) => game.setPartyName(e.target.value)}
-              className="form-input"
+              className="form-input w-full p-2 border rounded"
             />
           </div>
-          <div className="range-container">
-            <div className="range-labels"><span>Izquierda</span><span>Derecha</span></div>
+
+          <div className="mb-6">
+            <label className="form-label">Plantillas Ideológicas (Opcional)</label>
+            <div className="grid grid-cols-3 gap-2">
+              {FACTIONS.map((faction) => (
+                <button
+                  key={faction.id}
+                  onClick={() => game.setIdeologyPreset(faction)}
+                  className={`btn-faction ${faction.color}`}
+                >
+                  {faction.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* SLIDERS EXISTENTES (Se mueven solos si tocas los botones de arriba) */}
+          <div className="range-container mb-4">
+            <div className="range-labels flex justify-between text-xs"><span>Izquierda Económica</span><span>Derecha Económica</span></div>
             <input
               type="range"
               min="0"
               max="100"
               value={game.ideologyX}
               onChange={(e) => game.setIdeologyX(parseInt(e.target.value))}
-              className="range-input"
+              className="range-input w-full"
             />
           </div>
-          <div className="range-container">
-            <div className="range-labels"><span>Progresista</span><span>Conservador</span></div>
+          
+          <div className="range-container mb-6">
+            <div className="range-labels flex justify-between text-xs"><span>Libertario / Progresista</span><span>Autoritario / Conservador</span></div>
             <input
               type="range"
               min="0"
               max="100"
               value={game.ideologyY}
               onChange={(e) => game.setIdeologyY(parseInt(e.target.value))}
-              className="range-input"
+              className="range-input w-full"
             />
           </div>
-          <button onClick={game.handleFundarPartido} className="btn-primary">
+
+          {/* --- NUEVO: RESULTADO DINÁMICO --- */}
+        <div className="bg-gray-100 p-4 rounded-lg mb-6 text-center border border-gray-300">
+          <p className="text-xs text-gray-500 uppercase tracking-wide">Tu ideología se define como:</p>
+          <h3 className={`text-xl font-bold mt-1 ${game.currentIdeology?.color?.startsWith('text-') ? game.currentIdeology.color : game.currentIdeology?.color?.replace(/^bg-/, 'text-') || 'text-gray-700'}`}>
+            {game.currentIdeology?.name || "Indefinido"}
+          </h3>
+          <p className="text-sm text-gray-600 italic mt-1">
+            "{game.currentIdeology?.desc || "Aún no has definido una ideología."}"
+          </p>
+        </div>
+
+          <button onClick={game.handleFundarPartido} className="btn-primary w-full py-3 text-lg font-bold">
             Iniciar Gobierno
           </button>
         </div>

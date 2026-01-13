@@ -4,6 +4,7 @@ import { generateFactions } from '../functions/generateFactions';
 import { LAWS } from '../data/constants';
 import { calculateTaxVoteOutcome } from './taxVotingLogic';
 import { calculateLawVoteOutcome } from './lawVotingLogic';
+import { determineClosestFaction } from '../functions/ideologyAnalysis';
 
 const GDP_BASE = 100000;
 const TURNS_PER_LEGISLATURE = 20;
@@ -163,11 +164,23 @@ export const useGameLogic = () => {
     endTurn();
   };
 
+  // --- Lógica de Ideología (NUEVO) ---
+
+  // 1. Calculamos la ideología actual basada en los sliders en tiempo real
+  const currentIdeology = determineClosestFaction(ideologyX, ideologyY);
+
+  // 2. Función para cuando el usuario hace clic en un botón de facción
+  const setIdeologyPreset = (faction) => {
+    setIdeologyX(faction.x);
+    setIdeologyY(faction.y);
+  };
+
   return {
     phase, rivalParties, viewMode, setViewMode, turn, legislature, messages, 
     partyName, setPartyName, ideologyX, setIdeologyX, ideologyY, setIdeologyY,
     resources, candidates, currentLaw, economy, setEconomy,
     taxProposal, setTaxProposal, proposeTaxChange,
-    handleFundarPartido, handleAction, startLegislativeSession, voteOnLaw, activeFactions,
+    handleFundarPartido, handleAction, startLegislativeSession, voteOnLaw, activeFactions,currentIdeology, 
+    setIdeologyPreset,
   };
 };
