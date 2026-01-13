@@ -1,4 +1,4 @@
-// src/hooks/gameLogic/lawVotingLogic.js
+import { checkIdeologicalAlignment } from '../functions/ideologyAnalysis';
 
 const getPartySupportForLaw = (partyIdeology, lawFavor) => {
   if (!partyIdeology) return false;
@@ -31,46 +31,115 @@ export const calculateLawVoteOutcome = ({
   playerSeats,
   playerVote,
   economy,
-  gdpBase
+  gdpBase,
+  playerFaction // <-- Nueva entrada
 }) => {
   if (!currentLaw) {
-    return { approved: false, error: "No law", messages: ["Error: No hay ley en curso."] };
+    return {
+      approved: false,
+      error: "No law",
+      messages: ["Error: No hay ley en curso."],
+      cpDelta: 0
+    };
   }
 
-  let yesVotes = playerVote === 'yes' ? playerSeats : 0;
+  let yesVotes = 0;
+  let noVotes = 0;
+  const messages = [];
 
+  // Voto del jugador
+  if (playerVote === 'approve') {
+    yesVotes += playerSeats;
+  } else {
+    noVotes += playerSeats;
+  }
+
+  // Votos de partidos rivales
   rivalParties.forEach(party => {
     const supports = getPartySupportForLaw(party.ideology, currentLaw.favor);
-    if (supports) yesVotes += party.seats;
+    if (supports) {
+      yesVotes += party.seats;
+    } else {
+      noVotes += party.seats;
+    }
   });
 
-  const approved = yesVotes > 50;
-  const messages = [];
+  const approved = yesVotes > noVotes;
+
+  // --- CÁLCULO DE CAPITAL POLÍTICO ---
+  let cpDelta = 0;
+  let cpReason = "";
+
+  const alignment = checkIdeologicalAlignment(playerFaction, currentLaw.favor);
+
+  if (alignment === 'match') {
+    if (approved && playerVote === 'approve') {
+      cpDelta = 5;
+      cpReason = "¡Victoria Ideológica! (+5 CP)";
+    } else if (!approved && playerVote === 'approve') {
+      cpDelta = -2;
+      cpReason = "Promesa incumplida: Ley fallida (-2 CP)";
+    } else if (playerVote === 'reject') {
+      cpDelta = -5;
+      cpReason = "Traición a las bases: Votaste contra tu ideología (-5 CP)";
+    }
+  } else if (alignment === 'opposing') {
+    if (!approved && playerVote === 'reject') {
+      cpDelta = 3;
+      cpReason = "Bloqueo exitoso a la oposición (+3 CP)";
+    } else if (approved && playerVote === 'reject') {
+      cpDelta = 0;
+      cpReason = "Oposición ignorada (0 CP)";
+    } else if (playerVote === 'approve') {
+      cpDelta = -3;
+      cpReason = "Colaboracionismo con el rival (-3 CP)";
+    }
+  } else {
+    // Neutral / centro
+    if (approved) {
+      cpDelta = 1;
+      cpReason = "Gobernabilidad (+1 CP)";
+    }
+  }
+
+  if (cpReason) messages.push(cpReason);
+
+  // --- EFECTOS ECONÓMICOS ---
+  let fiscalImpact = 0;
+  let newAnnualSpending = economy.annualSpending;
+  let newDebt = economy.debt;
 
   if (approved) {
     messages.push(`Ley "${currentLaw.title}" APROBADA.`);
-    if (currentLaw.fiscalCost > 0) {
-      messages.push(`El gasto público aumenta en $${currentLaw.fiscalCost}M`);
-    } else if (currentLaw.fiscalCost < 0) {
-      messages.push(`El estado ahorra $${Math.abs(currentLaw.fiscalCost)}M`);
+    fiscalImpact = currentLaw.fiscalCost || 0;
+    newAnnualSpending += fiscalImpact;
+
+    if (fiscalImpact > 0) {
+      messages.push(`El gasto público aumenta en $${fiscalImpact}M`);
+    } else if (fiscalImpact < 0) {
+      messages.push(`El estado ahorra $${Math.abs(fiscalImpact)}M`);
     }
   } else {
-    messages.push(`Ley RECHAZADA.`);
+    messages.push(`Ley "${currentLaw.title}" RECHAZADA.`);
   }
 
-  // Cálculo de deuda (solo proyección)
+  // Cálculo de deuda (proyección anual)
   const revenue = (economy.taxRate / 100) * gdpBase;
-  const deficit = economy.annualSpending + (approved ? currentLaw.fiscalCost || 0 : 0) - revenue;
-  const debtChange = deficit / 1000;
-  const newDebt = Math.max(0, economy.debt + debtChange);
+  const deficit = newAnnualSpending - revenue;
+  const debtChange = deficit / 1000; // Asumiendo que GDP está en millones, deuda en % del PIB
+  newDebt = Math.max(0, economy.debt + debtChange);
+
+  const debtExceeds90 = newDebt > 90 && economy.debt <= 90;
 
   return {
     approved,
     yesVotes,
-    fiscalImpact: approved ? currentLaw.fiscalCost || 0 : 0,
-    newAnnualSpending: economy.annualSpending + (approved ? currentLaw.fiscalCost || 0 : 0),
+    noVotes,
+    fiscalImpact,
+    newAnnualSpending,
     newDebt,
-    debtExceeds90: newDebt > 90 && economy.debt <= 90,
-    messages
+    debtExceeds90,
+    messages,
+    cpDelta
   };
 };

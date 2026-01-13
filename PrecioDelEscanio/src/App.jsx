@@ -81,15 +81,19 @@ if (game.phase === 'setup') {
           </div>
 
           {/* --- NUEVO: RESULTADO DINÁMICO --- */}
-        <div className="bg-gray-100 p-4 rounded-lg mb-6 text-center border border-gray-300">
-          <p className="text-xs text-gray-500 uppercase tracking-wide">Tu ideología se define como:</p>
-          <h3 className={`text-xl font-bold mt-1 ${game.currentIdeology?.color?.startsWith('text-') ? game.currentIdeology.color : game.currentIdeology?.color?.replace(/^bg-/, 'text-') || 'text-gray-700'}`}>
-            {game.currentIdeology?.name || "Indefinido"}
-          </h3>
-          <p className="text-sm text-gray-600 italic mt-1">
-            "{game.currentIdeology?.desc || "Aún no has definido una ideología."}"
-          </p>
-        </div>
+          <div className="bg-gray-100 p-4 rounded-lg mb-6 text-center border border-gray-200">
+            <p className="text-xs text-gray-700 uppercase tracking-wide">Tu ideología se define como:</p>
+            <h3 className={`text-xl font-bold mt-1 ${
+              game.currentIdeology?.color?.startsWith('text-')
+                ? game.currentIdeology.color
+                : game.currentIdeology?.color?.replace(/^bg-/, 'text-') || 'text-gray-900'
+            }`}>
+              {game.currentIdeology?.name || "Indefinido"}
+            </h3>
+            <p className="text-sm text-gray-800 italic mt-1">
+              "{game.currentIdeology?.desc || "Aún no has definido una ideología."}"
+            </p>
+          </div>
 
           <button onClick={game.handleFundarPartido} className="btn-primary w-full py-3 text-lg font-bold">
             Iniciar Gobierno

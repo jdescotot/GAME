@@ -10,7 +10,7 @@ const GDP_BASE = 100000;
 const TURNS_PER_LEGISLATURE = 20;
 
 export const useGameLogic = () => {
-  // --- Estados (igual que antes) ---
+  // --- Estados ---
   const [phase, setPhase] = useState('setup');
   const [turn, setTurn] = useState(1);
   const [legislature, setLegislature] = useState(1);
@@ -36,7 +36,7 @@ export const useGameLogic = () => {
   const [currentLaw, setCurrentLaw] = useState(null);
   const [viewMode, setViewMode] = useState('seats');
 
-  // --- Generación de candidatos (igual) ---
+  // --- Generación de candidatos ---
   const generateCandidate = useCallback((id) => ({
     id, 
     name: `Político ${id}`, 
@@ -49,7 +49,7 @@ export const useGameLogic = () => {
     setCandidates([generateCandidate(1), generateCandidate(2), generateCandidate(3)]);
   }, [generateCandidate]);
 
-  // --- Sistema de mensajes (igual) ---
+  // --- Sistema de mensajes ---
   const addMessage = (text, type = 'neutral') => {
     const colorMap = { error: 'text-red-500', success: 'text-green-500', warning: 'text-yellow-500' };
     const uniqueId = Date.now() + Math.random();
@@ -63,13 +63,28 @@ export const useGameLogic = () => {
     addMessage(`¡${partyName} fundado! La economía está al ${economy.taxRate}% de impuestos.`, "success");
   };
 
+  // --- Elecciones con Capital Político ---
   const holdElections = () => {
     const newSeats = Math.max(1, Math.min(35, Math.floor((resources.popularity / 100) * 35)));
     const change = newSeats - resources.seats;
-    if (change > 0) addMessage(`¡Victoria electoral! Ganas ${change} escaños (${newSeats} total).`, "success");
-    else if (change < 0) addMessage(`Derrota electoral. Pierdes ${Math.abs(change)} escaños (${newSeats} total).`, "error");
-    else addMessage(`Empate electoral. Conservas ${newSeats} escaños.`, "warning");
-    setResources(prev => ({ ...prev, seats: newSeats }));
+    
+    // Ganancia de Capital Político: base 10 + 2 por escaño
+    const cpGain = 10 + (newSeats * 2);
+
+    if (change > 0) {
+      addMessage(`¡Victoria! ${newSeats} escaños. Capital Político renovado (+${cpGain}).`, "success");
+    } else if (change < 0) {
+      addMessage(`Derrota. ${newSeats} escaños. Capital Político ajustado (+${cpGain}).`, "error");
+    } else {
+      addMessage(`Estabilidad. ${newSeats} escaños. (+${cpGain} CP).`, "warning");
+    }
+
+    setResources(prev => ({ 
+      ...prev, 
+      seats: newSeats,
+      politicalCapital: prev.politicalCapital + cpGain
+    }));
+    
     setRivalParties(generateRivals(newSeats));
     setTurn(1);
     setLegislature(prev => prev + 1);
@@ -84,7 +99,7 @@ export const useGameLogic = () => {
     }
   };
 
-  // --- Propuesta de cambio de impuestos (ahora delegado) ---
+  // --- Propuesta de cambio de impuestos ---
   const proposeTaxChange = () => {
     const result = calculateTaxVoteOutcome({
       taxProposal,
@@ -114,9 +129,11 @@ export const useGameLogic = () => {
     endTurn();
   };
 
-  // --- Acciones de turno (igual) ---
+  // --- Acciones de turno ---
   const handleAction = (actionType) => {
-    // ... (sin cambios, ya es corto)
+    // Placeholder: puedes expandir según necesites
+    addMessage(`Acción ejecutada: ${actionType}`, "neutral");
+    endTurn();
   };
 
   const startLegislativeSession = () => {
@@ -125,15 +142,18 @@ export const useGameLogic = () => {
     setPhase('legislation');
   };
 
-  // --- Votación de leyes (ahora delegado) ---
+  // --- Votación de leyes con Capital Político ---
   const voteOnLaw = (playerVote) => {
+    const currentFaction = determineClosestFaction(ideologyX, ideologyY);
+
     const result = calculateLawVoteOutcome({
       currentLaw,
       rivalParties,
       playerSeats: resources.seats,
       playerVote,
       economy,
-      gdpBase: GDP_BASE
+      gdpBase: GDP_BASE,
+      playerFaction: currentFaction
     });
 
     if (result.error) {
@@ -143,11 +163,26 @@ export const useGameLogic = () => {
       return;
     }
 
+    // Clasificar mensajes por tipo (incluyendo CP)
     result.messages.forEach(msg => {
-      const type = msg.includes("APROBADA") || msg.includes("ahorra") ? "success" :
-                   msg.includes("RECHAZADA") ? "error" : "warning";
+      let type = "neutral";
+      if (msg.includes("APROBADA") || msg.includes("Victoria") || msg.includes("Bloqueo") || msg.includes("Gobernabilidad")) {
+        type = "success";
+      } else if (msg.includes("RECHAZADA") || msg.includes("Traición") || msg.includes("Colaboracionismo") || msg.includes("Promesa incumplida")) {
+        type = "error";
+      } else if (msg.includes("CP") || msg.includes("Capital")) {
+        type = "warning";
+      }
       addMessage(msg, type);
     });
+
+    // Aplicar cambio de Capital Político
+    if (result.cpDelta !== 0) {
+      setResources(prev => ({
+        ...prev,
+        politicalCapital: Math.max(0, prev.politicalCapital + result.cpDelta)
+      }));
+    }
 
     if (result.debtExceeds90) {
       addMessage("¡PELIGRO! La deuda está crítica.", "error");
@@ -164,12 +199,9 @@ export const useGameLogic = () => {
     endTurn();
   };
 
-  // --- Lógica de Ideología (NUEVO) ---
-
-  // 1. Calculamos la ideología actual basada en los sliders en tiempo real
+  // --- Lógica de Ideología ---
   const currentIdeology = determineClosestFaction(ideologyX, ideologyY);
 
-  // 2. Función para cuando el usuario hace clic en un botón de facción
   const setIdeologyPreset = (faction) => {
     setIdeologyX(faction.x);
     setIdeologyY(faction.y);
@@ -180,7 +212,7 @@ export const useGameLogic = () => {
     partyName, setPartyName, ideologyX, setIdeologyX, ideologyY, setIdeologyY,
     resources, candidates, currentLaw, economy, setEconomy,
     taxProposal, setTaxProposal, proposeTaxChange,
-    handleFundarPartido, handleAction, startLegislativeSession, voteOnLaw, activeFactions,currentIdeology, 
-    setIdeologyPreset,
+    handleFundarPartido, handleAction, startLegislativeSession, voteOnLaw, activeFactions,
+    currentIdeology, setIdeologyPreset,
   };
 };
