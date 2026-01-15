@@ -134,13 +134,12 @@ export const useGameLogic = () => {
     switch (actionType) {
       case 'campaign':
         if (resources.money >= 500) {
-          const popGain = 5 + Math.floor(Math.random() * 5);
           setResources(prev => ({
             ...prev,
             money: prev.money - 500,
-            popularity: Math.min(100, prev.popularity + popGain)
+            popularity: Math.min(100, prev.popularity + 2)
           }));
-          addMessage(`Campaña TV ejecutada. Popularidad +${popGain}.`, "success");
+          addMessage("Campaña ejecutada. Popularidad +2%.", "success");
         } else {
           addMessage("No tienes $500 para la campaña.", "error");
           return;
@@ -153,9 +152,9 @@ export const useGameLogic = () => {
             ...prev,
             politicalCapital: prev.politicalCapital - 5,
             money: prev.money + 800,
-            popularity: Math.max(0, prev.popularity - 3)
+            popularity: Math.max(0, prev.popularity - 1)
           }));
-          addMessage("Cabildeo realizado. +$800, -3% popularidad.", "success");
+          addMessage("Cabildeo realizado. +$800, -1% popularidad.", "success");
         } else {
           addMessage("No tienes 5 CP para cabildear.", "error");
           return;
@@ -164,13 +163,18 @@ export const useGameLogic = () => {
       
       case 'protest':
         if (resources.politicalCapital >= 10) {
-          const pressureGain = 15 + Math.floor(Math.random() * 10);
+          const success = Math.random() < 0.6;
+          const popChange = success ? 3 : -2;
+          const message = success 
+            ? "Marcha exitosa. Popularidad +3%." 
+            : "Marcha reprimida. Popularidad -2%.";
+          
           setResources(prev => ({
             ...prev,
             politicalCapital: prev.politicalCapital - 10,
-            popularity: Math.min(100, prev.popularity + pressureGain)
+            popularity: Math.min(100, Math.max(0, prev.popularity + popChange))
           }));
-          addMessage(`Marcha organizada. Presión política +${pressureGain}.`, "success");
+          addMessage(message, success ? "success" : "error");
         } else {
           addMessage("No tienes 10 CP para organizar marcha.", "error");
           return;
