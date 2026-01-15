@@ -86,7 +86,7 @@ if (game.phase === 'setup') {
             <h3 className={`text-xl font-bold mt-1 ${
               game.currentIdeology?.color?.startsWith('text-')
                 ? game.currentIdeology.color
-                : game.currentIdeology?.color?.replace(/^bg-/, 'text-') || 'text-gray-900'
+                : game.currentIdeology?.color?.replace(/^bg-/, 'text-') || 'text-gray-100'
             }`}>
               {game.currentIdeology?.name || "Indefinido"}
             </h3>

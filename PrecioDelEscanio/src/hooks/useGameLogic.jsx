@@ -131,8 +131,56 @@ export const useGameLogic = () => {
 
   // --- Acciones de turno ---
   const handleAction = (actionType) => {
-    // Placeholder: puedes expandir según necesites
-    addMessage(`Acción ejecutada: ${actionType}`, "neutral");
+    switch (actionType) {
+      case 'campaign':
+        if (resources.money >= 500) {
+          const popGain = 5 + Math.floor(Math.random() * 5);
+          setResources(prev => ({
+            ...prev,
+            money: prev.money - 500,
+            popularity: Math.min(100, prev.popularity + popGain)
+          }));
+          addMessage(`Campaña TV ejecutada. Popularidad +${popGain}.`, "success");
+        } else {
+          addMessage("No tienes $500 para la campaña.", "error");
+          return;
+        }
+        break;
+      
+      case 'lobby':
+        if (resources.politicalCapital >= 5) {
+          setResources(prev => ({
+            ...prev,
+            politicalCapital: prev.politicalCapital - 5,
+            money: prev.money + 800,
+            popularity: Math.max(0, prev.popularity - 3)
+          }));
+          addMessage("Cabildeo realizado. +$800, -3% popularidad.", "success");
+        } else {
+          addMessage("No tienes 5 CP para cabildear.", "error");
+          return;
+        }
+        break;
+      
+      case 'protest':
+        if (resources.politicalCapital >= 10) {
+          const pressureGain = 15 + Math.floor(Math.random() * 10);
+          setResources(prev => ({
+            ...prev,
+            politicalCapital: prev.politicalCapital - 10,
+            popularity: Math.min(100, prev.popularity + pressureGain)
+          }));
+          addMessage(`Marcha organizada. Presión política +${pressureGain}.`, "success");
+        } else {
+          addMessage("No tienes 10 CP para organizar marcha.", "error");
+          return;
+        }
+        break;
+      
+      default:
+        addMessage(`Acción ejecutada: ${actionType}`, "neutral");
+    }
+    
     endTurn();
   };
 
