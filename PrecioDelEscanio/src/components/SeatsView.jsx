@@ -116,12 +116,14 @@ export function SeatsView({
           flex: 1;
           background-color: rgba(15, 23, 42, 0.5);
           border-radius: 8px;
-          padding: 16px;
-          margin-bottom: 16px;
+          padding: 20px;
+          margin: 20px auto;
           display: flex;
           align-items: center;
           justify-content: center;
-          overflow: hidden;
+          overflow: visible;
+          width: 100%;
+          max-width: 500px;
         }
 
         .seat-legend {
