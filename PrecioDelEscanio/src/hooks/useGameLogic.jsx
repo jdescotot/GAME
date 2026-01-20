@@ -185,7 +185,8 @@ export const useGameLogic = () => {
         addMessage(`Acción ejecutada: ${actionType}`, "neutral");
     }
     
-    endTurn();
+    // Only end the turn for actions that consume a turn
+    if (!['campaign','lobby','protest'].includes(actionType)) endTurn();
   };
 
   const startLegislativeSession = () => {
