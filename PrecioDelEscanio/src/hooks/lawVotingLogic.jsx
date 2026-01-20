@@ -1,7 +1,20 @@
 import { checkIdeologicalAlignment } from '../functions/ideologyAnalysis';
 
-const getPartySupportForLaw = (partyIdeology, lawFavor) => {
+const getPartySupportForLaw = (partyIdeology, lawFavor, lawCost = 0, debtLevel = 0) => {
   if (!partyIdeology) return false;
+
+  // Si la deuda es muy alta (>75%) y la ley cuesta dinero, los partidos responsables tienden a rechazar
+  const highDebtMode = debtLevel > 75 && lawCost > 0;
+
+  // Partidos que son más responsables fiscalmente
+  const fiscallyResponsible = ['CENTER', 'RIGHT', 'CENTER_RIGHT'];
+  const isFiscallyResponsible = fiscallyResponsible.includes(partyIdeology);
+
+  // Si hay deuda crítica y ley costosa, los responsables rechazan más frecuentemente
+  if (highDebtMode && isFiscallyResponsible) {
+    // 70% de chance de rechazar leyes costosas en deuda alta
+    if (Math.random() > 0.3) return false;
+  }
 
   switch (partyIdeology) {
     case 'FAR_LEFT':
@@ -54,9 +67,14 @@ export const calculateLawVoteOutcome = ({
     noVotes += playerSeats;
   }
 
-  // Votos de partidos rivales
+  // Votos de partidos rivales (ahora considerando deuda)
   rivalParties.forEach(party => {
-    const supports = getPartySupportForLaw(party.ideology, currentLaw.favor);
+    const supports = getPartySupportForLaw(
+      party.ideology, 
+      currentLaw.favor,
+      currentLaw.fiscalCost || 0,
+      economy.debt || 0
+    );
     if (supports) {
       yesVotes += party.seats;
     } else {
