@@ -1,13 +1,22 @@
 import { checkIdeologicalAlignment } from '../functions/ideologyAnalysis';
 
+// Helper: normaliza favor a array de claves UPPERCASE
+const normalizeFavor = (favor) => {
+  if (!favor) return [];
+  if (Array.isArray(favor)) return favor;
+  return [favor];
+};
+
 const getPartySupportForLaw = (partyIdeology, lawFavor, lawCost = 0, debtLevel = 0) => {
   if (!partyIdeology) return false;
+
+  const favorArr = normalizeFavor(lawFavor);
 
   // Si la deuda es muy alta (>75%) y la ley cuesta dinero, los partidos responsables tienden a rechazar
   const highDebtMode = debtLevel > 75 && lawCost > 0;
 
   // Partidos que son más responsables fiscalmente
-  const fiscallyResponsible = ['CENTER', 'RIGHT', 'CENTER_RIGHT'];
+  const fiscallyResponsible = ['CENTER', 'RIGHT'];
   const isFiscallyResponsible = fiscallyResponsible.includes(partyIdeology);
 
   // Si hay deuda crítica y ley costosa, los responsables rechazan más frecuentemente
@@ -16,26 +25,32 @@ const getPartySupportForLaw = (partyIdeology, lawFavor, lawCost = 0, debtLevel =
     if (Math.random() > 0.3) return false;
   }
 
-  switch (partyIdeology) {
-    case 'FAR_LEFT':
-      return ['far-left', 'center-left'].includes(lawFavor);
-    case 'LEFT':
-      return ['center-left', 'green'].includes(lawFavor);
-    case 'CENTER':
-      return ['center-left', 'center-right', 'neutral', 'green'].includes(lawFavor);
-    case 'RIGHT':
-      return ['center-right', 'neutral'].includes(lawFavor);
-    case 'FAR_RIGHT':
-      return ['far-right', 'center-right'].includes(lawFavor);
-    case 'GREEN':
-      return ['green', 'center-left'].includes(lawFavor);
-    case 'MINOR':
-    case 'POPULIST':
-      if (['far-left', 'far-right'].includes(lawFavor)) return Math.random() > 0.3;
-      return ['center-left', 'center-right', 'neutral', 'green'].includes(lawFavor) && Math.random() > 0.5;
-    default:
-      return lawFavor === 'neutral' || Math.random() > 0.6;
+  // Mapeo: cada ideología apoya ciertas claves de favor
+  const supportMap = {
+    'FAR_LEFT': ['FAR_LEFT', 'LEFT'],
+    'LEFT': ['LEFT', 'CENTER', 'GREEN'],
+    'CENTER': ['LEFT', 'CENTER', 'RIGHT', 'GREEN'],
+    'RIGHT': ['RIGHT', 'CENTER'],
+    'FAR_RIGHT': ['FAR_RIGHT', 'RIGHT'],
+    'GREEN': ['GREEN', 'LEFT', 'CENTER'],
+    'MINOR': ['CENTER', 'GREEN'],
+    'POPULIST': ['CENTER', 'LEFT', 'RIGHT'],
+    'ANARCHIST': ['FAR_LEFT', 'LEFT', 'GREEN']
+  };
+
+  const supported = supportMap[partyIdeology] || ['CENTER'];
+  // Apoya si hay intersección entre lo que apoya y lo que favorece la ley
+  const hasMatch = favorArr.some(f => supported.includes(f));
+
+  // Para MINOR y POPULIST añadimos algo de aleatoriedad
+  if (['MINOR', 'POPULIST'].includes(partyIdeology)) {
+    if (favorArr.includes('FAR_LEFT') || favorArr.includes('FAR_RIGHT')) {
+      return Math.random() > 0.3;
+    }
+    return hasMatch && Math.random() > 0.4;
   }
+
+  return hasMatch;
 };
 
 export const calculateLawVoteOutcome = ({

@@ -1,24 +1,29 @@
 import React from 'react';
 import { Vote } from 'lucide-react';
 
-// Esta función auxiliar ahora vive aquí, manteniendo App.jsx limpio
-const getFavorLabelAndColor = (favor) => {
-  const map = {
-    'far-left': { label: 'Extrema Izquierda', color: '#f87171', bg: 'rgba(220, 38, 38, 0.2)' },
-    'center-left': { label: 'Centro-Izquierda', color: '#fca5a5', bg: 'rgba(251, 146, 60, 0.2)' },
-    'center-right': { label: 'Centro-Derecha', color: '#60a5fa', bg: 'rgba(37, 99, 235, 0.2)' },
-    'far-right': { label: 'Extrema Derecha', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.2)' },
-    'green': { label: 'Verdes', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.2)' },
-    'populist': { label: 'Populista', color: '#facc15', bg: 'rgba(202, 138, 4, 0.2)' },
-    'neutral': { label: 'Neutral', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.2)' }
-  };
-  return map[favor] || { label: favor, color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.2)' };
+// Mapeo de claves UPPERCASE a etiquetas y colores
+const FAVOR_MAP = {
+  'FAR_LEFT': { label: 'Extrema Izquierda', color: '#f87171', bg: 'rgba(220, 38, 38, 0.2)' },
+  'LEFT': { label: 'Izquierda', color: '#fca5a5', bg: 'rgba(251, 146, 60, 0.2)' },
+  'CENTER': { label: 'Centro', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.2)' },
+  'RIGHT': { label: 'Derecha', color: '#60a5fa', bg: 'rgba(37, 99, 235, 0.2)' },
+  'FAR_RIGHT': { label: 'Extrema Derecha', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.2)' },
+  'GREEN': { label: 'Verdes', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.2)' },
+  'POPULIST': { label: 'Populista', color: '#facc15', bg: 'rgba(202, 138, 4, 0.2)' },
+  'MINOR': { label: 'Minorías', color: '#a78bfa', bg: 'rgba(139, 92, 246, 0.2)' },
+  'ANARCHIST': { label: 'Progresistas', color: '#6b7280', bg: 'rgba(107, 114, 128, 0.2)' }
+};
+
+// Esta función ahora soporta string o array
+const getFavorLabelsAndColors = (favor) => {
+  const favorArr = Array.isArray(favor) ? favor : [favor];
+  return favorArr.map(f => FAVOR_MAP[f] || { label: f, color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.2)' });
 };
 
 export function LawCard({ law, onVote }) {
   if (!law) return null;
 
-  const { label, color, bg } = getFavorLabelAndColor(law.favor);
+  const favorTags = getFavorLabelsAndColors(law.favor);
 
   return (
     <div className="panel legislation-panel h-full flex flex-col">
@@ -37,10 +42,12 @@ export function LawCard({ law, onVote }) {
             {law.fiscalCost > 0 ? `Costo: $${law.fiscalCost}M` : `Ahorro: $${Math.abs(law.fiscalCost)}M`}
           </span>
 
-          {/* Etiqueta de Alineación Política Corregida */}
-          <span className="law-tag" style={{ backgroundColor: bg, color: color }}>
-            Favorece: {label}
-          </span>
+          {/* Etiquetas de Alineación Política (soporta múltiples) */}
+          {favorTags.map((tag, idx) => (
+            <span key={idx} className="law-tag" style={{ backgroundColor: tag.bg, color: tag.color }}>
+              {tag.label}
+            </span>
+          ))}
         </div>
 
         <p className="text-sm text-gray-400 mb-4">

@@ -21,39 +21,47 @@ export const determineClosestFaction = (currentX, currentY) => {
 };
 
 // --- NUEVA FUNCIÓN: Determinar Alineación con la Ley ---
-// Compara la facción del jugador con la etiqueta de la ley ('left', 'right', 'center', etc.)
+// Compara la facción del jugador con la etiqueta de la ley (ahora UPPERCASE keys o arrays)
 export const checkIdeologicalAlignment = (playerFaction, lawFavor) => {
     if (!playerFaction || !lawFavor) return 'neutral';
 
-    // Normalizamos las etiquetas de tus Facciones a los términos de las Leyes
-    // Asumo que tus Facciones tienen IDs como 'socialists', 'liberals', 'conservatives', etc.
-    // Ajusta los strings del 'case' según tus IDs en constants.jsx
-    let playerWing = 'center';
-    
-    switch (playerFaction.id) {
-        case 'communists':
-        case 'socialists':
-        case 'progressives':
-            playerWing = 'left';
-            break;
-        case 'conservatives':
-        case 'nationalists':
-        case 'fascists':
-            playerWing = 'right';
-            break;
-        case 'liberals':
-        case 'centrists':
-            playerWing = 'center';
-            break;
-        default:
-            playerWing = 'center';
-    }
+    // Normalizar lawFavor a array
+    const favorArr = Array.isArray(lawFavor) ? lawFavor : [lawFavor];
 
-    // Comparar con la ley
-    if (lawFavor === 'neutral') return 'neutral_law';
-    if (playerWing === lawFavor) return 'match'; // Es MI ideología
-    if (playerWing === 'left' && lawFavor === 'right') return 'opposing'; // Es el enemigo
-    if (playerWing === 'right' && lawFavor === 'left') return 'opposing'; // Es el enemigo
+    // Mapear faction.id a categorías de ala política
+    const leftIds = ['far_left', 'com', 'anarchist'];
+    const rightIds = ['cap', 'conserv', 'far_right'];
+    const greenIds = ['green'];
+    const centerIds = ['lib', 'pop'];
+
+    let playerWing = 'CENTER';
+    const fid = playerFaction.id;
+
+    if (leftIds.includes(fid)) playerWing = 'LEFT';
+    else if (rightIds.includes(fid)) playerWing = 'RIGHT';
+    else if (greenIds.includes(fid)) playerWing = 'GREEN';
+    else if (centerIds.includes(fid)) playerWing = 'CENTER';
+
+    // Determinar alineación
+    // Match: la ley favorece mi ala o una compatible
+    const matchMap = {
+      'LEFT': ['LEFT', 'FAR_LEFT', 'GREEN'],
+      'RIGHT': ['RIGHT', 'FAR_RIGHT'],
+      'GREEN': ['GREEN', 'LEFT'],
+      'CENTER': ['CENTER', 'LEFT', 'RIGHT', 'GREEN']
+    };
+    const opposingMap = {
+      'LEFT': ['RIGHT', 'FAR_RIGHT'],
+      'RIGHT': ['LEFT', 'FAR_LEFT'],
+      'GREEN': ['FAR_RIGHT'],
+      'CENTER': ['FAR_LEFT', 'FAR_RIGHT']
+    };
+
+    const myMatches = matchMap[playerWing] || ['CENTER'];
+    const myOpposing = opposingMap[playerWing] || [];
+
+    if (favorArr.some(f => myMatches.includes(f))) return 'match';
+    if (favorArr.some(f => myOpposing.includes(f))) return 'opposing';
     
-    return 'neutral'; // No es mi lucha directa
+    return 'neutral';
 };
