@@ -54,7 +54,7 @@ export const IDEOLOGIES = {
     color: 'text-gray-900',
     bg: 'bg-gray-900',
     hex: '#111827',
-    names: ["Colectivo Sin Amos", "Red Libertaria", "Asamblea Popular Autónoma", "Frente Antiautoritario", "Horizontalidad Ya"]
+    names: ["Progresistas", "Red Libertaria", "Asamblea Popular Autónoma", "Frente Antiautoritario", "Horizontalidad Ya"]
   },
   POPULIST: {
     id: 'populista',

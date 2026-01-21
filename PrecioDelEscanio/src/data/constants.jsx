@@ -20,7 +20,7 @@ export const FACTIONS = [
     },
     { 
         id: 'anarchist', // Base de: ANARCHIST (NUEVO)
-        name: 'Colectivos Libertarios', 
+        name: 'Progresistas', 
         x: 10, y: 10, // Economía comunal + Cero estado
         population: 5, 
         color: 'bg-gray-800', 
