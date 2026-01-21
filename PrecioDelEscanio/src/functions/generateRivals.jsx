@@ -19,6 +19,8 @@ const getUniqueName = (ideoData, usedNames) => {
   return fallbackName;
 };
 
+const clamp = (v, min = 3, max = 97) => Math.max(min, Math.min(max, v));
+
 export const generateRivals = (playerSeats) => {
   const rivals = [];
   let remainingSeats = 100 - playerSeats;
@@ -39,8 +41,8 @@ export const generateRivals = (playerSeats) => {
     color: 'text-yellow-500',
     bg: 'bg-yellow-500',
     hex: '#eab308',
-    x: 85 + Math.random() * 10,
-    y: 45 + Math.random() * 10
+    x: clamp(85 + Math.random() * 10),
+    y: clamp(45 + Math.random() * 10)
   });
 
   remainingSeats -= oligarchySeats;
@@ -60,8 +62,8 @@ export const generateRivals = (playerSeats) => {
     color: 'text-red-600',
     bg: 'bg-red-600',
     hex: '#dc2626',
-    x: 5 + Math.random() * 10,
-    y: 45 + Math.random() * 10
+    x: clamp(5 + Math.random() * 10),
+    y: clamp(45 + Math.random() * 10)
   });
 
   remainingSeats -= farLeftSeats;
@@ -93,8 +95,8 @@ export const generateRivals = (playerSeats) => {
       color: ideoData.color,
       bg: ideoData.bg,
       hex: ideoData.hex,
-      x: config.key === 'RIGHT' ? 65 + Math.random() * 15 : (config.key === 'LEFT' ? 15 + Math.random() * 15 : 45 + Math.random() * 10),
-      y: 20 + Math.random() * 60
+      x: clamp(config.key === 'RIGHT' ? 65 + Math.random() * 15 : (config.key === 'LEFT' ? 15 + Math.random() * 15 : 45 + Math.random() * 10)),
+      y: clamp(20 + Math.random() * 60)
     });
   });
 
@@ -137,8 +139,8 @@ export const generateRivals = (playerSeats) => {
         color: ideoData.color,
         bg: ideoData.bg,
         hex: ideoData.hex,
-        x: 10 + Math.random() * 80,
-        y: 60 + Math.random() * 30 
+        x: clamp(10 + Math.random() * 80),
+        y: clamp(60 + Math.random() * 30)
       });
     }
   }

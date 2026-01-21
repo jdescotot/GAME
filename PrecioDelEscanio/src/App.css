@@ -47,6 +47,9 @@
    ============================================ */
 .game-container {
   min-height: 100vh;
+  width: 100%;
+  padding-inline: 12px;
+  box-sizing: border-box;
   background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-bg) 50%, #0d1421 100%);
   color: var(--text-primary);
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -763,8 +766,9 @@
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: 0.5rem;
-  max-width: 400px;
-  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px 0;
   padding: 1.5rem;
   background: radial-gradient(circle, rgba(36, 52, 71, 0.3), transparent);
   border-radius: 0.75rem;

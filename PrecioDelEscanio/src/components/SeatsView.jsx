@@ -117,13 +117,14 @@ export function SeatsView({
           background-color: rgba(15, 23, 42, 0.5);
           border-radius: 8px;
           padding: 20px;
-          margin: 20px auto;
+          margin: 20px 0;
           display: flex;
           align-items: center;
           justify-content: center;
           overflow: visible;
           width: 100%;
-          max-width: 500px;
+          max-width: 1200px;
+          box-sizing: border-box;
         }
 
         .seat-legend {
@@ -155,7 +156,7 @@ export function SeatsView({
             viewBox="-200 -200 400 300"  // ⬅️ Más espacio en Y, centrado
             style={{
               width: '100%',
-              maxWidth: '600px',
+              maxWidth: '100%',
               height: 'auto',
               aspectRatio: '400/300'
             }}
